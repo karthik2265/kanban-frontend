@@ -1,11 +1,7 @@
+import ThemeContextProvider from "@/context/ThemeContext";
 
 function App() {
-
-  return (
-    <>
-     hi 
-    </>
-  )
+  return <ThemeContextProvider>hi</ThemeContextProvider>;
 }
 
-export default App
+export default App;
