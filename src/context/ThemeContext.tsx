@@ -23,17 +23,21 @@ const theme = {
   red: "#EA5555",
   redHover: "#FF9898",
   secondaryText: "#828FA3",
+  white: "#FFFFFF",
 };
 
+const ThemeContext = createContext<null | {
+  currentTheme: ThemeOptions;
+  setCurrentTheme: React.Dispatch<React.SetStateAction<ThemeOptions>>;
+}>(null);
 function ThemeContextProvider({ children }: { children: ReactNode }) {
   // use dark theme by default
   const [currentTheme, setCurrentTheme] = useState(ThemeOptions.Dark);
-  const ThemeContext = createContext({ currentTheme, setCurrentTheme });
 
   return (
     <ThemeContext.Provider value={{ currentTheme, setCurrentTheme }}>
       <StyledComponentsThemeContextProvider
-        theme={currentTheme === ThemeOptions.Dark ? { ...theme, darkTheme } : { ...theme, lightTheme }}
+        theme={currentTheme === ThemeOptions.Dark ? { ...theme, ...darkTheme } : { ...theme, ...lightTheme }}
       >
         {children}
       </StyledComponentsThemeContextProvider>
@@ -42,3 +46,4 @@ function ThemeContextProvider({ children }: { children: ReactNode }) {
 }
 
 export default ThemeContextProvider;
+export { ThemeContext };

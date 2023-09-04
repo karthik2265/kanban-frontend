@@ -8,6 +8,7 @@ export type Theme = {
   red: string;
   redHover: string;
   secondaryText: string;
+  white: string;
 };
 
 export enum ThemeOptions {
