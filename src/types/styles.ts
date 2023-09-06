@@ -9,6 +9,7 @@ export type Theme = {
   redHover: string;
   secondaryText: string;
   white: string;
+  isLightTheme: boolean;
 };
 
 export enum ThemeOptions {

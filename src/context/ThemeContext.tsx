@@ -37,7 +37,11 @@ function ThemeContextProvider({ children }: { children: ReactNode }) {
   return (
     <ThemeContext.Provider value={{ currentTheme, setCurrentTheme }}>
       <StyledComponentsThemeContextProvider
-        theme={currentTheme === ThemeOptions.Dark ? { ...theme, ...darkTheme } : { ...theme, ...lightTheme }}
+        theme={
+          currentTheme === ThemeOptions.Dark
+            ? { ...theme, ...darkTheme, isLightTheme: false }
+            : { ...theme, ...lightTheme, isLightTheme: true }
+        }
       >
         {children}
       </StyledComponentsThemeContextProvider>

@@ -1,13 +1,13 @@
-import React, { ReactNode } from "react";
+import { ReactNode } from "react";
 import styled from "styled-components";
 
-const StyledButtonPrimaryLarge = styled.div`
-  border-radius: 1.5rem;
+const StyledButtonPrimarySmall = styled.div`
+  border-radius: 1.25rem;
   background-color: ${(props) => props.theme.mainPurple};
-  font-size: 0.9375rem;
+  font-size: 0.8125rem;
   width: max-content;
   height: max-content;
-  padding: 0.75rem 4.5rem;
+  padding: 0.5rem 4.5rem;
   font-weight: 700;
   line-height: 1.4375rem;
   color: ${(props) => props.theme.white};
@@ -21,8 +21,8 @@ const StyledButtonPrimaryLarge = styled.div`
   }
 `;
 
-const ButtonPrimaryLarge = ({ children }: { children: ReactNode }) => {
-  return <StyledButtonPrimaryLarge>{children}</StyledButtonPrimaryLarge>;
+const ButtonPrimarySmall = ({ children }: { children: ReactNode }) => {
+  return <StyledButtonPrimarySmall>{children}</StyledButtonPrimarySmall>;
 };
 
-export default ButtonPrimaryLarge;
+export default ButtonPrimarySmall;
