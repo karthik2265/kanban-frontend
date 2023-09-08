@@ -2,13 +2,16 @@ import { styled } from "styled-components";
 import CheckBox from "./CheckBoxIcon";
 
 const StyledLabel = styled.label<{ $isChecked: boolean }>`
+  /* width and height will be set according to where it's being used
+   to make this component reusable */
+  width: 100%;
+  height: 100%;
   font-size: 0.75rem;
   font-style: normal;
   font-weight: 700;
   line-height: normal;
   padding: 1rem;
   border-radius: 0.25rem;
-  width: 21.875rem;
   color: ${(props) => props.theme.primaryText + (props.$isChecked ? "80" : "")};
   background-color: ${(props) => props.theme.secondaryBg};
   text-decoration: ${(props) => (props.$isChecked ? "line-through" : "none")};

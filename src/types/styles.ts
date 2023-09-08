@@ -2,7 +2,7 @@ export type Theme = {
   primaryBg: string;
   secondaryBg: string;
   primaryText: string;
-  highlightBackground: string;
+  lines: string;
   mainPurple: string;
   mainPurpleHover: string;
   red: string;

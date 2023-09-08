@@ -16,7 +16,7 @@ const StyledInput = styled.input<{ $error: boolean; $errorMessage: string }>`
 // need a wrapper because ::after psuedo elements do not work well with input element
 const StyledInputWrapper = styled.div<{ $error: boolean; $errorMessage: string }>`
   /* width and height will be set according to where it's being used
-   to make this component re usable */
+   to make this component reusable */
   width: 100%;
   height: 100%;
   border-radius: 0.25rem;

@@ -6,14 +6,14 @@ const lightTheme = {
   primaryBg: "#FFFFFF",
   secondaryBg: "#F4F7FD",
   primaryText: "#000112",
-  highlightBackground: "#E4EBFA",
+  lines: "#E4EBFA",
 };
 
 const darkTheme = {
   primaryBg: "#2B2C37",
   secondaryBg: "#20212C",
   primaryText: "#FFFFFF",
-  highlightBackground: "#3E3F4E",
+  lines: "#3E3F4E",
 };
 
 // common for both light theme and dark theme
@@ -28,14 +28,17 @@ const theme = {
 
 const ThemeContext = createContext<null | {
   currentTheme: ThemeOptions;
-  setCurrentTheme: React.Dispatch<React.SetStateAction<ThemeOptions>>;
+  toggleTheme: () => void;
 }>(null);
 function ThemeContextProvider({ children }: { children: ReactNode }) {
   // use dark theme by default
   const [currentTheme, setCurrentTheme] = useState(ThemeOptions.Dark);
-
+  const toggleTheme = () => {
+    if (currentTheme === ThemeOptions.Dark) setCurrentTheme(ThemeOptions.Light);
+    else setCurrentTheme(ThemeOptions.Dark);
+  };
   return (
-    <ThemeContext.Provider value={{ currentTheme, setCurrentTheme }}>
+    <ThemeContext.Provider value={{ currentTheme, toggleTheme }}>
       <StyledComponentsThemeContextProvider
         theme={
           currentTheme === ThemeOptions.Dark
@@ -49,5 +52,4 @@ function ThemeContextProvider({ children }: { children: ReactNode }) {
   );
 }
 
-export default ThemeContextProvider;
-export { ThemeContext };
+export { ThemeContext, ThemeContextProvider };

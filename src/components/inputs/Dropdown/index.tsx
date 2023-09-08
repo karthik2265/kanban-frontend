@@ -3,7 +3,10 @@ import { styled } from "styled-components";
 import DownArrowIcon from "./DownArrowIcon";
 
 const StyledSelect = styled.div<{ $isActive: boolean }>`
+  /* width and height will be set according to where it's being used
+   to make this component reusable */
   width: 100%;
+  height: 100%;
   outline: none;
   font-size: 0.8125rem;
   font-style: normal;
@@ -57,9 +60,9 @@ export type DropdownOption = {
 type DropdownProps = {
   options: DropdownOption[];
   placeholder?: string;
-  onChange: (id: string) => void;
+  onOptionSelect: (id: string) => void;
 };
-const Dropdown = ({ options, placeholder = "Please select an option", onChange }: DropdownProps) => {
+const Dropdown = ({ options, placeholder = "Please select an option", onOptionSelect }: DropdownProps) => {
   const [active, setIsActive] = useState(false);
   const [selectedOption, setSelectedOption] = useState(() => {
     const initiallySelectedOption = options.find((x) => x.isSelected);
@@ -77,7 +80,7 @@ const Dropdown = ({ options, placeholder = "Please select an option", onChange }
               key={option.id}
               onClick={() => {
                 setSelectedOption(option.id);
-                onChange(option.id);
+                onOptionSelect(option.id);
               }}
             >
               {option.displayText}
