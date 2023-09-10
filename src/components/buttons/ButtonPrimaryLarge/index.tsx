@@ -5,8 +5,8 @@ const StyledButtonPrimaryLarge = styled.div`
   border-radius: 1.5rem;
   background-color: ${(props) => props.theme.mainPurple};
   font-size: 0.9375rem;
-  width: max-content;
-  height: max-content;
+  width: 100%;
+  height: 100%;
   padding: 0.75rem 4.5rem;
   font-weight: 700;
   line-height: 1.4375rem;

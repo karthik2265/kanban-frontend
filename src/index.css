@@ -6,3 +6,22 @@
   margin: 0;
   box-sizing: border-box;
 }
+
+/* For Webkit browsers like Chrome, Safari */
+::-webkit-scrollbar {
+  width: 0.20rem;
+}
+
+::-webkit-scrollbar-track {
+  background: none;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #888;
+}
+
+/* For Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #888 #f1f1f1;
+}
