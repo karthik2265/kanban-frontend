@@ -16,9 +16,31 @@ import { BoardContext } from "@/context/BoardContext";
 
 const StyledMenuAndContentWrapper = styled.div<{ $isSecondaryMenuOpen: boolean }>`
   position: fixed;
+  height: 100%;
+  width: ${(props) => (props.$isSecondaryMenuOpen ? "calc(100vw - 18.75rem)" : "100vw")};
   left: ${(props) => (props.$isSecondaryMenuOpen ? "18.75rem" : "0")}; /* width = secondary menu open */
   transition: left 0.3s ease-in-out;
+
+  @media (max-width: 800px) {
+    left: ${(props) => (props.$isSecondaryMenuOpen ? "16.25rem" : "0")}; /* width = secondary menu open */
+    width: ${(props) => (props.$isSecondaryMenuOpen ? "calc(100vw - 16.25rem)" : "100vw")};
+  }
 `;
+
+const StyledContentWrapper = styled.div`
+  background-color: ${(props) => props.theme.secondaryBg};
+  width: 100%;
+  height: 100%;
+  position: fixed;
+  top: 6rem;
+`;
+
+const StyledLayoutWrapper = styled.div`
+  width: 100vw;
+  height: 100vh;
+  background-color: ${props => props.theme.primaryBg};
+  display: flex;
+`
 
 const Layout = () => {
   const boards = [
@@ -34,12 +56,13 @@ const Layout = () => {
   const { isSecondaryMenuOpen } = useContext(RootLayoutContext)!;
   const { selectedBoard } = useContext(BoardContext)!;
   return (
-    <div style={{ display: "flex" }}>
+    <StyledLayoutWrapper>
       <SecondaryMenu boards={boards} />
       <StyledMenuAndContentWrapper $isSecondaryMenuOpen={isSecondaryMenuOpen}>
         <Menu board={selectedBoard ? boards.find((x) => x.id === selectedBoard)! : null} />
+        <StyledContentWrapper>main content</StyledContentWrapper>
       </StyledMenuAndContentWrapper>
-    </div>
+    </StyledLayoutWrapper>
   );
 };
 

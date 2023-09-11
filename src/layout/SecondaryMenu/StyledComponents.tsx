@@ -2,18 +2,22 @@ import { styled } from "styled-components";
 
 export const StyledWrapper = styled.div<{ $isOpen: boolean }>`
   height: 100vh;
-  width: max-content;
   background-color: ${(props) => props.theme.primaryBg};
   display: flex;
   flex-direction: column;
   gap: 1rem;
   position: relative;
+  z-index: 3;
   left: 0;
   top: 0;
   border-right: ${(props) => `0.0625rem solid ${props.theme.lines}`};
   width: 18.75rem; /* need this for pushing animation */
   transform: translateX(${(props) => (props.$isOpen ? "0" : "-100%")});
   transition: transform 0.3s ease-in-out;
+
+  @media (max-width: 800px) {
+    width: 16.25rem;
+  }
 `;
 
 export const StyledSecondaryMenuAction = styled.div<{ $isActive: boolean }>`
@@ -56,7 +60,6 @@ export const StyledMainSection = styled.div`
   display: flex;
   flex-direction: column;
   color: ${(props) => props.theme.secondaryText};
-  padding: 1.5rem;
   padding-top: 0;
   padding-left: 0;
   font-size: 0.9375rem;
