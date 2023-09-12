@@ -5,15 +5,16 @@ export const StyledMenuWrapper = styled.div`
   height: 6rem;
   display: flex;
   align-items: center;
-  background-color: ${props => props.theme.primaryBg};
+  background-color: ${(props) => props.theme.primaryBg};
   border-bottom: 1px solid ${(props) => props.theme.lines};
-`;
 
-export const StyledLogoWrapper = styled.div`
-  border-right: 1px solid ${(props) => props.theme.lines};
-  padding: 1.25rem;
-  display: flex;
-  justify-content: center;
+  @media (max-width: 800px) {
+    height: 5rem;
+  }
+
+  @media (max-width: 650px) {
+    height: 4rem;
+  }
 `;
 
 export const StyledMenuContentWrapper = styled.div`
@@ -21,9 +22,49 @@ export const StyledMenuContentWrapper = styled.div`
   justify-content: space-between;
   align-items: center;
   width: 100%;
-  gap: 1rem;
-  padding: 1.25rem;
+  gap: 2rem;
+  padding: 0 1.25rem;
 `;
+
+// *** left side section -> start
+
+export const StyledLogoWrapper = styled.div<{ $isSecondaryMenuOpen: boolean }>`
+  border-right: 1px solid ${(props) => props.theme.lines};
+  display: ${(props) => (props.$isSecondaryMenuOpen ? "none" : "flex")};
+  justify-content: center;
+  height: 100%;
+  align-items: center;
+  padding: 0 1.5rem;
+
+  @media (max-width: 650px) {
+    display: flex;
+  }
+`;
+
+// TODO use react truncate library
+export const StyledBoardTitleWrapper = styled.div`
+  @media (max-width: 650px) {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+  }
+`;
+
+export const StyledDownArrowIconWrapper = styled.div<{ $isSecondaryMenuOpen: boolean }>`
+  display: none;
+  @media (max-width: 650px) {
+    display: block;
+    transform: rotate(${(props) => (props.$isSecondaryMenuOpen ? "180deg" : "0")});
+    transition: transform 0.3s ease-in-out;
+    color: ${(props) => props.theme.mainPurple};
+  }
+`;
+
+// **** left side section -> end
+
+// *** right side section -> start
 
 export const StyledAddNewTaskActionButton = styled.div<{ $isAvailable: boolean }>`
   width: 10.25rem;
@@ -46,6 +87,15 @@ export const StyledAddNewTaskActionButton = styled.div<{ $isAvailable: boolean }
   &:active {
     scale: ${(props) => (props.$isAvailable ? 0.97 : 1)};
   }
+
+  @media (max-width: 650px) {
+    height: 2rem;
+    width: 3rem;
+
+    span:last-child {
+      display: none;
+    }
+  }
 `;
 
 export const StyledActionsWrapper = styled.div`
@@ -57,7 +107,6 @@ export const StyledActionsWrapper = styled.div`
 
 export const StyledOptionsIconWrapper = styled.div`
   color: ${(props) => props.theme.secondaryText};
-  padding: 0.5rem;
   &:hover {
     cursor: pointer;
     color: ${(props) => props.theme.mainPurple};
@@ -108,3 +157,5 @@ export const StyledDeleteOption = styled.div`
     color: ${(props) => props.theme.redHover};
   }
 `;
+
+// *** right side secrion -> end

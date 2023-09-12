@@ -11,10 +11,14 @@ const StyledExtraLargeHeading = styled.h1`
   @media (max-width: 800px) {
     font-size: 1.25rem;
   }
+
+  @media (max-width: 650px) {
+    font-size: 1.125rem;
+  }
 `;
 
-const ExtraLargeHeading = ({ children }: { children: ReactNode }) => {
-  return <StyledExtraLargeHeading>{children}</StyledExtraLargeHeading>;
+const ExtraLargeHeading: React.FC<{ children: ReactNode; onClick?: () => void }> = ({ children, onClick }) => {
+  return <StyledExtraLargeHeading onClick={onClick}>{children}</StyledExtraLargeHeading>;
 };
 
 export default ExtraLargeHeading;

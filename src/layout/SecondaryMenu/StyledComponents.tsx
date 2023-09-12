@@ -18,6 +18,18 @@ export const StyledWrapper = styled.div<{ $isOpen: boolean }>`
   @media (max-width: 800px) {
     width: 16.25rem;
   }
+
+  @media (max-width: 650px) {
+    width: 16.5rem;
+    height: 20.125rem;
+    position: fixed;
+    top: 5rem;
+    left: 4rem;
+    border: none;
+    border-radius: 0.5rem;
+    transform: translateY(${(props) => (props.$isOpen ? "0" : "calc(-100% - 5rem)")});
+    transition: transform 0.3s ease-in-out;
+  }
 `;
 
 export const StyledSecondaryMenuAction = styled.div<{ $isActive: boolean }>`
@@ -50,6 +62,10 @@ export const StyledHeaderSection = styled.div`
   padding: 1.5rem;
   padding-left: 1rem; /* same as board */
   height: 5rem;
+
+  @media (max-width: 650px) {
+    display: none;
+  }
 `;
 
 // *** header section -> end ***
@@ -83,10 +99,9 @@ export const StyledBoardsHeader = styled.div`
   color: ${(props) => props.theme.secondaryText};
 `;
 
-export const StyledBoardName = styled.div`
+export const StyledBoardTitle = styled.div`
   overflow: hidden;
   width: 90%;
-  height: 1rem;
   display: flex;
   align-items: center;
 `;
@@ -104,7 +119,10 @@ export const StyledFooterSection = styled.div`
   color: ${(props) => props.theme.secondaryText};
   font-weight: 700;
   margin-bottom: 2rem;
-  height: 8rem;
+
+  @media (max-width: 650px) {
+    margin-bottom: 1rem;
+  }
 `;
 
 export const StyledThemeToggleButton = styled.div`
@@ -142,6 +160,12 @@ export const StyledToggleCircleIcon = styled.div<{ $toggled: boolean }>`
   transition: left 0.3s ease-in-out;
 `;
 
+export const HideSideBarActionWrapper = styled.div`
+  @media (max-width: 650px) {
+    display: none;
+  }
+`;
+
 // *** footer section -> end ***
 
 export const StyledOpenSecondaryMenuButton = styled.div<{ $isSecondaryMenuOpen: boolean }>`
@@ -161,5 +185,9 @@ export const StyledOpenSecondaryMenuButton = styled.div<{ $isSecondaryMenuOpen: 
 
   &:hover {
     cursor: pointer;
+  }
+
+  @media (max-width: 650px) {
+    display: none;
   }
 `;

@@ -14,6 +14,10 @@ const StyledLogoText = styled.div`
   color: ${(props) => props.theme.primaryText};
   font-weight: 900;
   font-size: 1.75rem;
+
+  @media (max-width: 650px) {
+    display: none;
+  }
 `;
 
 const LogoWrapper = styled.div`

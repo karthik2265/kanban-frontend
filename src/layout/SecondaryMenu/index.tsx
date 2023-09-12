@@ -1,6 +1,6 @@
 // styled components
 import {
-  StyledBoardName,
+  StyledBoardTitle,
   StyledBoardsHeader,
   StyledFooterSection,
   StyledMainSection,
@@ -11,6 +11,7 @@ import {
   StyledHeaderSection,
   StyledOpenSecondaryMenuButton,
   StyledSecondaryMenuAction,
+  HideSideBarActionWrapper,
 } from "./StyledComponents";
 // icons
 import BoardIcon from "./BoardIcon";
@@ -25,6 +26,7 @@ import { ThemeContext } from "@/context/ThemeContext";
 import { ThemeOptions } from "@/types/styles";
 import { RootLayoutContext } from "@/context/RootLayoutContext";
 import { BoardContext } from "@/context/BoardContext";
+import { truncateText } from "@/util";
 
 type SecondaryMenuProps = {
   boards: Board[];
@@ -50,12 +52,13 @@ const SecondaryMenu = ({ boards }: SecondaryMenuProps) => {
             <StyledSecondaryMenuAction
               key={board.id}
               onClick={() => {
+                toggleSecondaryMenuVisibility();
                 setSelectedBoard(board.id);
               }}
               $isActive={selectedBoard === board.id}
             >
               <BoardIcon />
-              <StyledBoardName>{board.title}</StyledBoardName>
+              <StyledBoardTitle>{truncateText(board.title, 15)}</StyledBoardTitle>
             </StyledSecondaryMenuAction>
           );
         })}
@@ -72,10 +75,12 @@ const SecondaryMenu = ({ boards }: SecondaryMenuProps) => {
           </StyledThemeToggleIconWrapper>
           <MoonIcon />
         </StyledThemeToggleButton>
-        <StyledSecondaryMenuAction $isActive={false} onClick={toggleSecondaryMenuVisibility}>
-          <EyeSlashIcon />
-          <div>Hide Sidebar</div>
-        </StyledSecondaryMenuAction>
+        <HideSideBarActionWrapper>
+          <StyledSecondaryMenuAction $isActive={false} onClick={toggleSecondaryMenuVisibility}>
+            <EyeSlashIcon />
+            <div>Hide Sidebar</div>
+          </StyledSecondaryMenuAction>
+        </HideSideBarActionWrapper>
       </StyledFooterSection>
       <StyledOpenSecondaryMenuButton $isSecondaryMenuOpen={isSecondaryMenuOpen} onClick={toggleSecondaryMenuVisibility}>
         <EyeIcon />

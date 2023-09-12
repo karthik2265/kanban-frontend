@@ -7,3 +7,7 @@
 ## How UI 
 
 * Desktop first
+
+## learnings
+
+* Store media queries in constants

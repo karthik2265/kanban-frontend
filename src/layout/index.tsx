@@ -22,8 +22,13 @@ const StyledMenuAndContentWrapper = styled.div<{ $isSecondaryMenuOpen: boolean }
   transition: left 0.3s ease-in-out;
 
   @media (max-width: 800px) {
-    left: ${(props) => (props.$isSecondaryMenuOpen ? "16.25rem" : "0")}; /* width = secondary menu open */
+    left: ${(props) => (props.$isSecondaryMenuOpen ? "16.25rem" : "0")};
     width: ${(props) => (props.$isSecondaryMenuOpen ? "calc(100vw - 16.25rem)" : "100vw")};
+  }
+
+  @media (max-width: 650px) {
+    left: 0;
+    width: 100vw;
   }
 `;
 
@@ -33,6 +38,13 @@ const StyledContentWrapper = styled.div`
   height: 100%;
   position: fixed;
   top: 6rem;
+  @media (max-width: 800px) {
+    top: 5rem;
+  }
+
+  @media (max-width: 650px) {
+    top: 4rem;
+  }
 `;
 
 const StyledLayoutWrapper = styled.div`
@@ -47,7 +59,7 @@ const Layout = () => {
     { title: "Fatum", id: "ggf", columns: null, isSelected: true },
     { title: "marketing", id: "ma", columns: null, isSelected: false },
     {
-      title: "connect 4 what will happen if i have a long board name like this",
+      title: "connect 4 what will happen if i have a long board name like this and even more text",
       id: "c4",
       columns: null,
       isSelected: false,
