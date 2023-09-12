@@ -50,9 +50,21 @@ const StyledContentWrapper = styled.div`
 const StyledLayoutWrapper = styled.div`
   width: 100vw;
   height: 100vh;
-  background-color: ${props => props.theme.primaryBg};
+  background-color: ${(props) => props.theme.primaryBg};
   display: flex;
-`
+`;
+
+const StyledSecondaryMenuBackground = styled.div<{ $isSecondaryMenuOpen: boolean }>`
+  @media (max-width: 650px) {
+    background-color: ${(props) => props.theme.black};
+    opacity: 0.5;
+    position: fixed;
+    top: 4rem;
+    height: calc(100vh - 4rem);
+    width: 100vw;
+    display: ${(props) => (props.$isSecondaryMenuOpen ? "block" : "none")};
+  }
+`;
 
 const Layout = () => {
   const boards = [
@@ -65,7 +77,7 @@ const Layout = () => {
       isSelected: false,
     },
   ];
-  const { isSecondaryMenuOpen } = useContext(RootLayoutContext)!;
+  const { isSecondaryMenuOpen, toggleSecondaryMenuVisibility } = useContext(RootLayoutContext)!;
   const { selectedBoard } = useContext(BoardContext)!;
   return (
     <StyledLayoutWrapper>
@@ -74,6 +86,7 @@ const Layout = () => {
         <Menu board={selectedBoard ? boards.find((x) => x.id === selectedBoard)! : null} />
         <StyledContentWrapper>main content</StyledContentWrapper>
       </StyledMenuAndContentWrapper>
+      <StyledSecondaryMenuBackground onClick={toggleSecondaryMenuVisibility} $isSecondaryMenuOpen={isSecondaryMenuOpen} />
     </StyledLayoutWrapper>
   );
 };

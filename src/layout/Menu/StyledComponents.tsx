@@ -41,7 +41,6 @@ export const StyledLogoWrapper = styled.div<{ $isSecondaryMenuOpen: boolean }>`
   }
 `;
 
-// TODO use react truncate library
 export const StyledBoardTitleWrapper = styled.div`
   @media (max-width: 650px) {
     display: flex;
@@ -103,6 +102,7 @@ export const StyledActionsWrapper = styled.div`
   align-items: center;
   gap: 1rem;
   position: relative;
+  z-index: 3;
 `;
 
 export const StyledOptionsIconWrapper = styled.div`

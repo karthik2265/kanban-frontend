@@ -1,4 +1,4 @@
-import { ReactNode, createContext, useState } from "react";
+import { ReactNode, createContext, useCallback, useState } from "react";
 
 const RootLayoutContext = createContext<null | {
   isSecondaryMenuOpen: boolean;
@@ -7,9 +7,9 @@ const RootLayoutContext = createContext<null | {
 
 function RootLayoutContextProvider({ children }: { children: ReactNode }) {
   const [isSecondaryMenuOpen, setIsSecondaryMenuOpen] = useState(true);
-  const toggleSecondaryMenuVisibility = () => {
+  const toggleSecondaryMenuVisibility = useCallback(() => {
     setIsSecondaryMenuOpen((prev) => !prev);
-  };
+  }, [setIsSecondaryMenuOpen]);
   return (
     <RootLayoutContext.Provider value={{ isSecondaryMenuOpen, toggleSecondaryMenuVisibility }}>
       {children}

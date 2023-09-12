@@ -24,7 +24,7 @@ export const StyledWrapper = styled.div<{ $isOpen: boolean }>`
     height: 20.125rem;
     position: fixed;
     top: 5rem;
-    left: 4rem;
+    left: 5rem;
     border: none;
     border-radius: 0.5rem;
     transform: translateY(${(props) => (props.$isOpen ? "0" : "calc(-100% - 5rem)")});
