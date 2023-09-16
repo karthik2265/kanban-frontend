@@ -6,11 +6,14 @@ const StyledButtonPrimaryLarge = styled.div`
   background-color: ${(props) => props.theme.mainPurple};
   font-size: 0.9375rem;
   width: 100%;
-  height: 100%;
-  padding: 0.75rem 4.5rem;
+  height: 2.5rem;
   font-weight: 700;
   line-height: 1.4375rem;
   color: ${(props) => props.theme.white};
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
   &:hover {
     cursor: pointer;
     background-color: ${(props) => props.theme.mainPurpleHover};
@@ -21,8 +24,19 @@ const StyledButtonPrimaryLarge = styled.div`
   }
 `;
 
-const ButtonPrimaryLarge = ({ children }: { children: ReactNode }) => {
-  return <StyledButtonPrimaryLarge>{children}</StyledButtonPrimaryLarge>;
+const ButtonPrimaryLarge = ({
+  children,
+  onClick,
+}: {
+  children: ReactNode;
+  onClick: () => void;
+  height: string;
+}) => {
+  return (
+    <StyledButtonPrimaryLarge onClick={onClick}>
+      {children}
+    </StyledButtonPrimaryLarge>
+  );
 };
 
 export default ButtonPrimaryLarge;

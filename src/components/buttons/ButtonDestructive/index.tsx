@@ -5,8 +5,8 @@ const StyledButtonDestructive = styled.div`
   border-radius: 1.25rem;
   background-color: ${(props) => props.theme.red};
   font-size: 0.8125rem;
-  width: max-content;
-  height: max-content;
+  width: 100%;
+  height: 2.5rem;
   padding: 0.5rem 4.5rem;
   font-weight: 700;
   line-height: 1.4375rem;

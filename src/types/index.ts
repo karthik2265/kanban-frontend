@@ -1,5 +1,5 @@
 export type Board = {
-  id: string;
+  id?: string;
   title: string;
   columns?: BoardColumn[] | null;
   order: number;
@@ -7,20 +7,20 @@ export type Board = {
 };
 
 export type BoardColumn = {
-  id: string;
+  id?: string;
   title: string;
   order: number;
 };
 
 export type Task = {
-  id: string;
+  id?: string;
   title: string;
   description?: string | null;
   subTasks?: SubTask[] | null;
 };
 
 export type SubTask = {
-  id: string;
+  id?: string;
   value: string;
   isDone: boolean;
   order: number;

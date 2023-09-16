@@ -7,7 +7,7 @@
   
  */
 
-import { useContext } from "react";
+import { ReactNode, useContext } from "react";
 import SecondaryMenu from "@/layout/SecondaryMenu";
 import { RootLayoutContext } from "@/context/RootLayoutContext";
 import { styled } from "styled-components";
@@ -36,7 +36,6 @@ const StyledContentWrapper = styled.div`
   background-color: ${(props) => props.theme.secondaryBg};
   width: 100%;
   height: 100%;
-  position: fixed;
   top: 6rem;
   @media (max-width: 800px) {
     top: 5rem;
@@ -66,7 +65,7 @@ const StyledSecondaryMenuBackground = styled.div<{ $isSecondaryMenuOpen: boolean
   }
 `;
 
-const Layout = () => {
+const Layout = ({ children }: { children: ReactNode }) => {
   const boards = [
     { title: "Fatum", id: "ggf", columns: null, isSelected: true },
     { title: "marketing", id: "ma", columns: null, isSelected: false },
@@ -84,14 +83,14 @@ const Layout = () => {
       <SecondaryMenu boards={boards} />
       <StyledMenuAndContentWrapper $isSecondaryMenuOpen={isSecondaryMenuOpen}>
         <Menu board={selectedBoard ? boards.find((x) => x.id === selectedBoard)! : null} />
-        <StyledContentWrapper>main content</StyledContentWrapper>
+        <StyledContentWrapper>{children}</StyledContentWrapper>
       </StyledMenuAndContentWrapper>
-      <StyledSecondaryMenuBackground onClick={toggleSecondaryMenuVisibility} $isSecondaryMenuOpen={isSecondaryMenuOpen} />
+      <StyledSecondaryMenuBackground
+        onClick={toggleSecondaryMenuVisibility}
+        $isSecondaryMenuOpen={isSecondaryMenuOpen}
+      />
     </StyledLayoutWrapper>
   );
 };
 
 export default Layout;
-
-// TODO
-// * put menu, secondary menu and content in a wrapper for smoother animations

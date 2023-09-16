@@ -24,7 +24,7 @@ const theme = {
   redHover: "#FF9898",
   secondaryText: "#828FA3",
   white: "#FFFFFF",
-  black: "#000",
+  black: "#000000",
 };
 
 const ThemeContext = createContext<null | {
@@ -33,7 +33,7 @@ const ThemeContext = createContext<null | {
 }>(null);
 function ThemeContextProvider({ children }: { children: ReactNode }) {
   // use dark theme by default
-  const [currentTheme, setCurrentTheme] = useState(ThemeOptions.Dark);
+  const [currentTheme, setCurrentTheme] = useState(ThemeOptions.Light);
   const toggleTheme = () => {
     if (currentTheme === ThemeOptions.Dark) setCurrentTheme(ThemeOptions.Light);
     else setCurrentTheme(ThemeOptions.Dark);
