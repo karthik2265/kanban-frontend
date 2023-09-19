@@ -66,6 +66,8 @@ const StyledSecondaryMenuBackground = styled.div<{ $isSecondaryMenuOpen: boolean
 `;
 
 const Layout = ({ children }: { children: ReactNode }) => {
+  // need to get this data from data manager
+  // remove initial data and get started it's getting too complicated
   const boards = [
     { title: "Fatum", id: "ggf", columns: null, isSelected: true },
     { title: "marketing", id: "ma", columns: null, isSelected: false },
@@ -77,7 +79,11 @@ const Layout = ({ children }: { children: ReactNode }) => {
     },
   ];
   const { isSecondaryMenuOpen, toggleSecondaryMenuVisibility } = useContext(RootLayoutContext)!;
-  const { selectedBoard } = useContext(BoardContext)!;
+  const { selectedBoard, setSelectedBoard, boardDataManager } = useContext(BoardContext)!;
+  // use custom hook
+  // const [boards, setBoards] = useState(() => {
+    
+  // })
   return (
     <StyledLayoutWrapper>
       <SecondaryMenu boards={boards} />

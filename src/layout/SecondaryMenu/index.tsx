@@ -1,4 +1,4 @@
-// styled components
+// components
 import {
   StyledBoardTitle,
   StyledBoardsHeader,
@@ -13,6 +13,7 @@ import {
   StyledSecondaryMenuAction,
   HideSideBarActionWrapper,
 } from "./StyledComponents";
+import CreateNewBoard from "@/components/UpdateOrCreateNewBoard";
 // icons
 import BoardIcon from "./BoardIcon";
 import Logo from "@/components/Logo";
@@ -21,12 +22,13 @@ import MoonIcon from "@/components/icons/Moon";
 import EyeSlashIcon from "@/components/icons/EyeSlash";
 import EyeIcon from "@/components/icons/Eye";
 // context
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { ThemeContext } from "@/context/ThemeContext";
 import { ThemeOptions } from "@/types/styles";
 import { RootLayoutContext } from "@/context/RootLayoutContext";
 import { BoardContext } from "@/context/BoardContext";
 import { truncateText } from "@/util";
+import Modal from "@/components/Modal";
 
 type SecondaryMenuProps = {
   boards: Board[];
@@ -39,7 +41,8 @@ type Board = {
 const SecondaryMenu = ({ boards }: SecondaryMenuProps) => {
   const { toggleTheme, currentTheme } = useContext(ThemeContext)!;
   const { toggleSecondaryMenuVisibility, isSecondaryMenuOpen } = useContext(RootLayoutContext)!;
-  const { selectedBoard, setSelectedBoard } = useContext(BoardContext)!;
+  const { selectedBoard, setSelectedBoard, boardDataManager } = useContext(BoardContext)!;
+  const [isCreateNewBoardModalOpen, setIsCreateNewBoardModalOpen] = useState(false);
   return (
     <StyledWrapper $isOpen={isSecondaryMenuOpen}>
       <StyledHeaderSection>
@@ -62,7 +65,12 @@ const SecondaryMenu = ({ boards }: SecondaryMenuProps) => {
             </StyledSecondaryMenuAction>
           );
         })}
-        <StyledSecondaryMenuAction $isActive={false}>
+        <StyledSecondaryMenuAction
+          onClick={() => {
+            setIsCreateNewBoardModalOpen(true);
+          }}
+          $isActive={false}
+        >
           <BoardIcon />
           <div>+ Create New Board</div>
         </StyledSecondaryMenuAction>
@@ -85,6 +93,17 @@ const SecondaryMenu = ({ boards }: SecondaryMenuProps) => {
       <StyledOpenSecondaryMenuButton $isSecondaryMenuOpen={isSecondaryMenuOpen} onClick={toggleSecondaryMenuVisibility}>
         <EyeIcon />
       </StyledOpenSecondaryMenuButton>
+      {/* create new board modal */}
+      <Modal isOpen={isCreateNewBoardModalOpen} setIsOpen={setIsCreateNewBoardModalOpen}>
+        <CreateNewBoard
+          onSubmit={(newBoard) => {
+            boardDataManager.addBoard(newBoard);
+            setSelectedBoard(newBoard.id);
+            // TODO show notification baord created
+            setIsCreateNewBoardModalOpen(false);
+          }}
+        />
+      </Modal>
     </StyledWrapper>
   );
 };

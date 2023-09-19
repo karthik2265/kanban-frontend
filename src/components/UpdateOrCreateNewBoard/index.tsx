@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { BoardColumn } from "@/types";
+import { Board, BoardColumn } from "@/types";
 import styled from "styled-components";
 import { generateTemporaryId } from "@/util";
 // components
@@ -37,14 +37,10 @@ const StyledCrossIonWrapper = styled.div`
   }
 `;
 
-interface BoardData {
-  title: string;
-  columns: BoardColumn[];
-}
-
 type UpdateOrCreateNewBoardProps = {
-  onSubmit: (board: BoardData) => void;
-  initialValues?: BoardData | null;
+  onSubmit: (board: Board) => void;
+  initialValues?: Board | null;
+  newBoardOrder?: number;
 };
 
 const defaultColumns = [
@@ -65,10 +61,10 @@ function isDataValid({ title, columns }: { title: string; columns: BoardColumn[]
  some text and initial state of inputs depends on whether this 
  component is used in create mode or update mode 
 */
-const UpdateOrCreateNewBoard = ({ onSubmit, initialValues = null }: UpdateOrCreateNewBoardProps) => {
+const UpdateOrCreateNewBoard = ({ onSubmit, initialValues = null, newBoardOrder = 1 }: UpdateOrCreateNewBoardProps) => {
   const isCreateMode = initialValues === null;
   const [title, setTitle] = useState(isCreateMode ? "" : initialValues.title);
-  const [columns, setColumns] = useState<BoardColumn[]>(isCreateMode ? defaultColumns : initialValues.columns);
+  const [columns, setColumns] = useState<BoardColumn[]>(isCreateMode ? defaultColumns : initialValues.columns!);
   const [isFormSubmitted, setIsFormSubmitted] = useState(false);
   return (
     <StyledCreateNewBoardWrapper>
@@ -139,7 +135,7 @@ const UpdateOrCreateNewBoard = ({ onSubmit, initialValues = null }: UpdateOrCrea
               onClick={() => {
                 setIsFormSubmitted(true);
                 if (isDataValid({ title, columns })) {
-                  onSubmit({ title, columns });
+                  onSubmit({ title, columns, id: generateTemporaryId(), order: newBoardOrder });
                 } else {
                   // TODO show notification form is not valid
                 }
