@@ -9,15 +9,20 @@ const StyledModalBackground = styled.div<{ $isOpen: boolean }>`
   width: 100vw;
   height: 100vh;
   background-color: ${(props) => props.theme.black + "80"};
+  display: flex;
   justify-content: center;
   align-items: center;
-  display: ${(props) => (props.$isOpen ? "flex" : "none")};
+  opacity: ${(props) => (props.$isOpen ? "1" : "0")};
+  visibility: ${(props) => (props.$isOpen ? "visible" : "hidden")};
+  transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
   z-index: 9;
 `;
 
 const StyledModalContentWrapper = styled.div<{ $isOpen: boolean }>`
-  scale: ${(props) => (props.$isOpen ? "1" : "0.3")};
-  transition: scale 0.3s ease-in-out;
+  transform: translateY(${(props) => (props.$isOpen ? "0" : "-50vh")})
+    scale(${(props) => (props.$isOpen ? "1" : "0.3")});
+  opacity: ${(props) => (props.$isOpen ? "1" : "0")};
+  transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
 `;
 
 type ModalProps = {
