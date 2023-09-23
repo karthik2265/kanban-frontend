@@ -11,7 +11,11 @@ export const StyledBoardWrapper = styled.div`
 export const StyledColumnTasksWrapper = styled.div`
   display: flex;
   flex-direction: column;
+  justify-content: center;
+  align-items: center;
   gap: 1.25rem;
+  padding-bottom: 1.25rem;
+  width: 17.5rem;
 `;
 
 export const StyledTask = styled.div`

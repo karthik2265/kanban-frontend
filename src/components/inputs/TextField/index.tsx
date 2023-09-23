@@ -48,7 +48,6 @@ const TextField = ({
   errorMessage,
   initialValue = undefined,
 }: TextFieldProps) => {
-  console.log("show error ?", showErrorMessage, errorMessage);
   const [isFocused, setIsFocused] = useState(false);
   return (
     <StyledInputWrapper $error={!isFocused && showErrorMessage} $errorMessage={errorMessage}>

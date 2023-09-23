@@ -33,7 +33,7 @@ const ThemeContext = createContext<null | {
 }>(null);
 function ThemeContextProvider({ children }: { children: ReactNode }) {
   // use dark theme by default
-  const [currentTheme, setCurrentTheme] = useState(ThemeOptions.Light);
+  const [currentTheme, setCurrentTheme] = useState(ThemeOptions.Dark);
   const toggleTheme = () => {
     if (currentTheme === ThemeOptions.Dark) setCurrentTheme(ThemeOptions.Light);
     else setCurrentTheme(ThemeOptions.Dark);
