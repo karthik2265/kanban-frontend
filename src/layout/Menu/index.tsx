@@ -21,6 +21,8 @@ import DownArrowIcon from "@/components/icons/DownArrow";
 import { truncateText } from "@/util";
 import Modal from "@/components/Modal";
 import NewTask from "@/components/NewTask";
+import EditBoard from "@/components/UpdateOrCreateNewBoard";
+import DeleteBoard from "@/components/DeleteBoard";
 
 type MenuProps = {
   board: Omit<Board, "order"> | null;
@@ -32,6 +34,8 @@ const Menu = ({ board }: MenuProps) => {
   const [isOptionsOpen, setIsOptionsOpen] = useState(false);
   // modals
   const [isNewTaskModalOpen, setIsNewTaskModalOpen] = useState(false);
+  const [isEditBoardModalOpen, setIsEditBoardModalOpen] = useState(false);
+  const [isDeleteBoardModalOpen, setIsDeleteBoardModalOpen] = useState(false);
   return (
     <StyledMenuWrapper>
       <StyledLogoWrapper $isSecondaryMenuOpen={isSecondaryMenuOpen}>
@@ -64,15 +68,17 @@ const Menu = ({ board }: MenuProps) => {
               <span> Add New Task</span>
             </div>
           </StyledAddNewTaskActionButton>
-          <StyledOptionsIconWrapper onClick={() => setIsOptionsOpen((prev) => !prev)}>
-            <MoreOptionsIcon />
-          </StyledOptionsIconWrapper>
-          {isOptionsOpen && (
+          {board && (
+            <StyledOptionsIconWrapper onClick={() => setIsOptionsOpen((prev) => !prev)}>
+              <MoreOptionsIcon />
+            </StyledOptionsIconWrapper>
+          )}
+          {board && isOptionsOpen && (
             <StyledOptionsWrapper>
               <StyledEditOption
                 onClick={() => {
+                  setIsEditBoardModalOpen(true);
                   setIsOptionsOpen(false);
-                  // TODO create edit board modal
                 }}
               >
                 Edit
@@ -80,7 +86,7 @@ const Menu = ({ board }: MenuProps) => {
               <StyledDeleteOption
                 onClick={() => {
                   setIsOptionsOpen(false);
-                  // TODO create delete board modal
+                  setIsDeleteBoardModalOpen(true);
                 }}
               >
                 Delete
@@ -98,6 +104,34 @@ const Menu = ({ board }: MenuProps) => {
               setIsNewTaskModalOpen(false);
               // TODO
               // handle the data using data manager and show a notification
+            }}
+          />
+        )}
+      </Modal>
+      <Modal isOpen={isEditBoardModalOpen} setIsOpen={setIsEditBoardModalOpen}>
+        {board && (
+          <EditBoard
+            initialValues={board}
+            onSubmit={(updatedBoard) => {
+              // TODO
+              // update bord data using data manager
+              console.log(updatedBoard);
+              setIsEditBoardModalOpen(false);
+            }}
+          />
+        )}
+      </Modal>
+      <Modal isOpen={isDeleteBoardModalOpen} setIsOpen={setIsDeleteBoardModalOpen}>
+        {board && (
+          <DeleteBoard
+            title={board.title}
+            id={board.id}
+            onSubmit={(id) => {
+              if (id) {
+                // TODO
+                // delete board and show a notification
+              }
+              setIsDeleteBoardModalOpen(false);
             }}
           />
         )}

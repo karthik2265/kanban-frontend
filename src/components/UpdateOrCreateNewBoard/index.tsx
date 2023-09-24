@@ -38,9 +38,8 @@ const StyledCrossIonWrapper = styled.div`
 `;
 
 type UpdateOrCreateNewBoardProps = {
-  onSubmit: (board: Board) => void;
-  initialValues?: Board | null;
-  newBoardOrder?: number;
+  onSubmit: (board: Omit<Board, "order">) => void;
+  initialValues?: Omit<Board, "order"> | null;
 };
 
 const defaultColumns = [
@@ -61,10 +60,13 @@ function isDataValid({ title, columns }: { title: string; columns: BoardColumn[]
  some text and initial state of inputs depends on whether this 
  component is used in create mode or update mode 
 */
-const UpdateOrCreateNewBoard = ({ onSubmit, initialValues = null, newBoardOrder = 1 }: UpdateOrCreateNewBoardProps) => {
+const UpdateOrCreateNewBoard = ({ onSubmit, initialValues = null }: UpdateOrCreateNewBoardProps) => {
   const isCreateMode = initialValues === null;
   const [title, setTitle] = useState(isCreateMode ? "" : initialValues.title);
-  const [columns, setColumns] = useState<BoardColumn[]>(isCreateMode ? defaultColumns : initialValues.columns!);
+  const [columns, setColumns] = useState<BoardColumn[]>(() => {
+    if (isCreateMode || !initialValues.columns) return defaultColumns;
+    return initialValues.columns;
+  });
   const [isFormSubmitted, setIsFormSubmitted] = useState(false);
   return (
     <StyledWrapper>
@@ -77,7 +79,7 @@ const UpdateOrCreateNewBoard = ({ onSubmit, initialValues = null, newBoardOrder 
             onChange={(x) => setTitle(x)}
             showErrorMessage={isFormSubmitted && !title}
             errorMessage="Can't be empty"
-            initialValue={title}
+            value={title}
           />
         </div>
       </div>
@@ -89,7 +91,7 @@ const UpdateOrCreateNewBoard = ({ onSubmit, initialValues = null, newBoardOrder 
               <div key={column.id} style={{ height: "2.5rem", display: "flex", gap: "1.25rem", alignItems: "center" }}>
                 <div style={{ flex: 1 }}>
                   <TextField
-                    initialValue={column.title}
+                    value={column.title}
                     placeholder="e.g. Todo"
                     onChange={(newTitle) => {
                       setColumns((prev) => {
@@ -135,7 +137,7 @@ const UpdateOrCreateNewBoard = ({ onSubmit, initialValues = null, newBoardOrder 
               onClick={() => {
                 setIsFormSubmitted(true);
                 if (isDataValid({ title, columns })) {
-                  onSubmit({ title, columns, id: generateTemporaryId(), order: newBoardOrder });
+                  onSubmit({ title, columns, id: generateTemporaryId() });
                 } else {
                   // TODO show notification form is not valid
                 }

@@ -21,8 +21,8 @@ const StyledButtonDestructive = styled.div`
   }
 `;
 
-const ButtonDestructive = ({ children }: { children: ReactNode }) => {
-  return <StyledButtonDestructive>{children}</StyledButtonDestructive>;
+const ButtonDestructive = ({ children, onClick }: { children: ReactNode; onClick: () => void }) => {
+  return <StyledButtonDestructive onClick={onClick}>{children}</StyledButtonDestructive>;
 };
 
 export default ButtonDestructive;

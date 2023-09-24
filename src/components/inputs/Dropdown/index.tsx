@@ -68,7 +68,7 @@ const Dropdown = ({ options, placeholder = "Please select an option", value, onO
   const [selectedOption, setSelectedOption] = useState(value);
   return (
     <StyledSelect $isActive={active} onClick={() => setIsActive((prev) => !prev)}>
-      {selectedOption ? options.find((x) => x.id === selectedOption)!.displayText : placeholder}
+      {selectedOption ? options.find((x) => x.id === selectedOption)?.displayText : placeholder}
       <StyledOptions $isActive={active}>
         {options.map((option) => {
           return (
