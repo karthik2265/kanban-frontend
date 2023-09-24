@@ -25,6 +25,12 @@ const StyledWrapper = styled.div`
   border-radius: 0.375rem;
   background-color: ${(props) => props.theme.primaryBg};
   padding: 2rem;
+
+  @media (max-width: 650px) {
+    width: 21.4375rem;
+    height: 41.1875rem;
+    padding: 1rem;
+  }
 `;
 
 const StyledInputWrapper = styled.div`
