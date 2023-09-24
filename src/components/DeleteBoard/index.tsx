@@ -13,7 +13,22 @@ const StyledWrapper = styled.div`
   gap: 1.25rem;
   border-radius: 0.375rem;
   background-color: ${(props) => props.theme.primaryBg};
+
+  @media (max-width: 650px) {
+    width: 21.4375rem;
+  }
 `;
+
+const StyledActionsWrapper = styled.div`
+  display: flex;
+  gap: 1rem;
+
+  @media (max-width: 650px) {
+    flex-direction: column;
+    gap: 0.65rem;
+  }
+`;
+
 const DeleteBoard = ({ title, id, onSubmit }: { title: string; id: string; onSubmit: (id: string | null) => void }) => {
   return (
     <StyledWrapper>
@@ -21,10 +36,10 @@ const DeleteBoard = ({ title, id, onSubmit }: { title: string; id: string; onSub
       <MediumBodyText isPrimary={false}>
         {`Are you sure you want to delete the ‘${title}’ board? This action will remove all columns and tasks and cannot be reversed.`}
       </MediumBodyText>
-      <div style={{ display: "flex", gap: "1rem" }}>
+      <StyledActionsWrapper>
         <ButtonDestructive onClick={() => onSubmit(id)}>Delete</ButtonDestructive>
         <ButtonSecondary onClick={() => onSubmit(null)}>Cancel</ButtonSecondary>
-      </div>
+      </StyledActionsWrapper>
     </StyledWrapper>
   );
 };

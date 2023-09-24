@@ -11,6 +11,10 @@ const StyledButtonDestructive = styled.div`
   font-weight: 700;
   line-height: 1.4375rem;
   color: ${(props) => props.theme.white};
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
   &:hover {
     cursor: pointer;
     background-color: ${(props) => props.theme.redHover};
