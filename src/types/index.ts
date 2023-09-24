@@ -14,6 +14,7 @@ export type BoardDetails = {
 export type BoardColumn = {
   id: string;
   title: string;
+  order: number;
 };
 
 export type Task = {
@@ -21,10 +22,12 @@ export type Task = {
   title: string;
   description?: string | null;
   subTasks?: SubTask[] | null;
+  order: number;
 };
 
 export type SubTask = {
   id: string;
   value: string;
   isDone: boolean;
+  order: number;
 };

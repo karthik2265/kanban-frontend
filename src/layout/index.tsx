@@ -13,6 +13,7 @@ import { RootLayoutContext } from "@/context/RootLayoutContext";
 import { styled } from "styled-components";
 import Menu from "./Menu";
 import { BoardContext } from "@/context/BoardContext";
+import { generateTemporaryId } from "@/util";
 
 const StyledMenuAndContentWrapper = styled.div<{ $isSecondaryMenuOpen: boolean }>`
   position: fixed;
@@ -69,7 +70,26 @@ const Layout = ({ children }: { children: ReactNode }) => {
   // need to get this data from data manager
   // remove initial data and get started it's getting too complicated
   const boards = [
-    { title: "Fatum", id: "ggf", columns: null, isSelected: true },
+    {
+      title: "Fatum",
+      id: "ggf",
+      columns: [
+        {
+          id: generateTemporaryId(),
+          title: "Todo",
+          tasks: [{ id: generateTemporaryId(), title: "Running", subTasksDone: 2, totalSubTasks: 4, order: 1 }],
+        },
+        {
+          id: generateTemporaryId(),
+          title: "Doing",
+          tasks: [
+            { id: generateTemporaryId(), title: "React web app", subTasksDone: 3, totalSubTasks: 12, order: 1 },
+            { id: generateTemporaryId(), title: "Supbase backend", subTasksDone: 5, totalSubTasks: 6, order: 2 },
+          ],
+        },
+      ],
+      isSelected: true,
+    },
     { title: "marketing", id: "ma", columns: null, isSelected: false },
     {
       title: "connect 4 what will happen if i have a long board name like this and even more text",

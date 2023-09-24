@@ -11,6 +11,10 @@ const StyledButtonPrimarySmall = styled.div`
   font-weight: 700;
   line-height: 1.4375rem;
   color: ${(props) => props.theme.white};
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  
   &:hover {
     cursor: pointer;
     background-color: ${(props) => props.theme.mainPurpleHover};
@@ -21,8 +25,8 @@ const StyledButtonPrimarySmall = styled.div`
   }
 `;
 
-const ButtonPrimarySmall = ({ children }: { children: ReactNode }) => {
-  return <StyledButtonPrimarySmall>{children}</StyledButtonPrimarySmall>;
+const ButtonPrimarySmall = ({ children, onClick }: { children: ReactNode; onClick: () => void }) => {
+  return <StyledButtonPrimarySmall onClick={onClick}>{children}</StyledButtonPrimarySmall>;
 };
 
 export default ButtonPrimarySmall;

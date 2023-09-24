@@ -19,14 +19,19 @@ import {
 } from "./StyledComponents";
 import DownArrowIcon from "@/components/icons/DownArrow";
 import { truncateText } from "@/util";
+import Modal from "@/components/Modal";
+import NewTask from "@/components/NewTask";
 
 type MenuProps = {
   board: Omit<Board, "order"> | null;
 };
 
 const Menu = ({ board }: MenuProps) => {
+  console.log("board = ", board);
   const { isSecondaryMenuOpen, toggleSecondaryMenuVisibility } = useContext(RootLayoutContext)!;
   const [isOptionsOpen, setIsOptionsOpen] = useState(false);
+  // modals
+  const [isNewTaskModalOpen, setIsNewTaskModalOpen] = useState(false);
   return (
     <StyledMenuWrapper>
       <StyledLogoWrapper $isSecondaryMenuOpen={isSecondaryMenuOpen}>
@@ -46,7 +51,14 @@ const Menu = ({ board }: MenuProps) => {
           </StyledDownArrowIconWrapper>
         </StyledBoardTitleWrapper>
         <StyledActionsWrapper>
-          <StyledAddNewTaskActionButton $isAvailable={!!(board && board.columns)}>
+          <StyledAddNewTaskActionButton
+            $isAvailable={!!(board && board.columns)}
+            onClick={() => {
+              if (board && board.columns) {
+                setIsNewTaskModalOpen(true);
+              }
+            }}
+          >
             <div>
               <span>+</span>
               <span> Add New Task</span>
@@ -77,6 +89,19 @@ const Menu = ({ board }: MenuProps) => {
           )}
         </StyledActionsWrapper>
       </StyledMenuContentWrapper>
+      {/* modals */}
+      <Modal isOpen={isNewTaskModalOpen} setIsOpen={setIsNewTaskModalOpen}>
+        {board && board.columns && (
+          <NewTask
+            boardColumns={board!.columns!}
+            onSubmit={(newtask) => {
+              setIsNewTaskModalOpen(false);
+              // TODO
+              // handle the data using data manager and show a notification
+            }}
+          />
+        )}
+      </Modal>
     </StyledMenuWrapper>
   );
 };

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { styled } from "styled-components";
 
-const StyledInput = styled.input<{ $error: boolean; $errorMessage: string }>`
+const StyledTextarea = styled.textarea<{ $error: boolean; $errorMessage: string }>`
   width: 100%;
   height: 100%;
   color: ${(props) => props.theme.primaryText};
@@ -15,7 +15,7 @@ const StyledInput = styled.input<{ $error: boolean; $errorMessage: string }>`
 `;
 
 // need a wrapper because ::after psuedo elements do not work well with input element
-const StyledInputWrapper = styled.div<{ $error: boolean; $errorMessage: string }>`
+const StyledTextareaWrapper = styled.div<{ $error: boolean; $errorMessage: string }>`
   /* width and height will be set according to where it's being used
    to make this component reusable */
   width: 100%;
@@ -34,24 +34,18 @@ const StyledInputWrapper = styled.div<{ $error: boolean; $errorMessage: string }
   }
 `;
 
-type TextFieldProps = {
+type TextareaProps = {
   placeholder: string;
   onChange: (x: string) => void;
   showErrorMessage: boolean;
   errorMessage?: string;
   value: string;
 };
-const TextField = ({
-  placeholder,
-  onChange,
-  showErrorMessage,
-  errorMessage = "",
-  value = "",
-}: TextFieldProps) => {
+const Textarea = ({ placeholder, onChange, showErrorMessage, errorMessage = "", value = "" }: TextareaProps) => {
   const [isFocused, setIsFocused] = useState(false);
   return (
-    <StyledInputWrapper $error={!isFocused && showErrorMessage} $errorMessage={errorMessage}>
-      <StyledInput
+    <StyledTextareaWrapper $error={!isFocused && showErrorMessage} $errorMessage={errorMessage}>
+      <StyledTextarea
         value={value}
         placeholder={placeholder}
         onFocus={() => setIsFocused(true)}
@@ -60,8 +54,8 @@ const TextField = ({
         $error={showErrorMessage && !isFocused}
         $errorMessage={errorMessage}
       />
-    </StyledInputWrapper>
+    </StyledTextareaWrapper>
   );
 };
 
-export default TextField;
+export default Textarea;

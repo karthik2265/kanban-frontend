@@ -10,7 +10,7 @@ import ButtonPrimaryLarge from "@/components/buttons/ButtonPrimaryLarge";
 import ButtonSecondary from "@/components/buttons/ButtonSecondary";
 import CrossIcon from "@/components/icons/Cross";
 
-const StyledCreateNewBoardWrapper = styled.div`
+const StyledWrapper = styled.div`
   border-radius: 0.375rem;
   width: 30rem;
   max-height: 26.8125rem;
@@ -67,7 +67,7 @@ const UpdateOrCreateNewBoard = ({ onSubmit, initialValues = null, newBoardOrder 
   const [columns, setColumns] = useState<BoardColumn[]>(isCreateMode ? defaultColumns : initialValues.columns!);
   const [isFormSubmitted, setIsFormSubmitted] = useState(false);
   return (
-    <StyledCreateNewBoardWrapper>
+    <StyledWrapper>
       <LargeHeading>{isCreateMode ? "Add New Board" : "Edit Board"}</LargeHeading>
       <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
         <MediumBoldBodyText>Board Name</MediumBoldBodyText>
@@ -146,7 +146,7 @@ const UpdateOrCreateNewBoard = ({ onSubmit, initialValues = null, newBoardOrder 
           </div>
         </div>
       </div>
-    </StyledCreateNewBoardWrapper>
+    </StyledWrapper>
   );
 };
 

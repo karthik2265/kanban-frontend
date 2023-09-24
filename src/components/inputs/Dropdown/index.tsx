@@ -60,16 +60,12 @@ export type DropdownOption = {
 type DropdownProps = {
   options: DropdownOption[];
   placeholder?: string;
+  value: string;
   onOptionSelect: (id: string) => void;
 };
-const Dropdown = ({ options, placeholder = "Please select an option", onOptionSelect }: DropdownProps) => {
+const Dropdown = ({ options, placeholder = "Please select an option", value, onOptionSelect }: DropdownProps) => {
   const [active, setIsActive] = useState(false);
-  const [selectedOption, setSelectedOption] = useState(() => {
-    const initiallySelectedOption = options.find((x) => x.isSelected);
-    if (initiallySelectedOption) return initiallySelectedOption.id;
-    if (options.length > 0) return options[0].id;
-    return null;
-  });
+  const [selectedOption, setSelectedOption] = useState(value);
   return (
     <StyledSelect $isActive={active} onClick={() => setIsActive((prev) => !prev)}>
       {selectedOption ? options.find((x) => x.id === selectedOption)!.displayText : placeholder}
