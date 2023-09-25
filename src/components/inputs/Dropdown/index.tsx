@@ -54,7 +54,6 @@ const StyledOption = styled.div`
 export type DropdownOption = {
   id: string;
   displayText: string;
-  isSelected: boolean;
 };
 
 type DropdownProps = {

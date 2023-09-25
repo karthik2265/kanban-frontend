@@ -1,5 +1,4 @@
 import Logo from "@/components/Logo";
-import MoreOptionsIcon from "@/components/icons/MoreOptions";
 import ExtraLargeHeading from "@/components/typography/ExtraLargeHeading";
 import { RootLayoutContext } from "@/context/RootLayoutContext";
 import { Board } from "@/types";
@@ -10,10 +9,6 @@ import {
   StyledMenuContentWrapper,
   StyledAddNewTaskActionButton,
   StyledActionsWrapper,
-  StyledOptionsIconWrapper,
-  StyledOptionsWrapper,
-  StyledEditOption,
-  StyledDeleteOption,
   StyledBoardTitleWrapper,
   StyledDownArrowIconWrapper,
 } from "./StyledComponents";
@@ -23,6 +18,7 @@ import Modal from "@/components/Modal";
 import NewTask from "@/components/NewTask";
 import EditBoard from "@/components/UpdateOrCreateNewBoard";
 import DeleteBoard from "@/components/DeleteBoard";
+import MoreOptions from "@/components/MoreOptions";
 
 type MenuProps = {
   board: Omit<Board, "order"> | null;
@@ -31,7 +27,6 @@ type MenuProps = {
 const Menu = ({ board }: MenuProps) => {
   console.log("board = ", board);
   const { isSecondaryMenuOpen, toggleSecondaryMenuVisibility } = useContext(RootLayoutContext)!;
-  const [isOptionsOpen, setIsOptionsOpen] = useState(false);
   // modals
   const [isNewTaskModalOpen, setIsNewTaskModalOpen] = useState(false);
   const [isEditBoardModalOpen, setIsEditBoardModalOpen] = useState(false);
@@ -69,29 +64,12 @@ const Menu = ({ board }: MenuProps) => {
             </div>
           </StyledAddNewTaskActionButton>
           {board && (
-            <StyledOptionsIconWrapper onClick={() => setIsOptionsOpen((prev) => !prev)}>
-              <MoreOptionsIcon />
-            </StyledOptionsIconWrapper>
-          )}
-          {board && isOptionsOpen && (
-            <StyledOptionsWrapper>
-              <StyledEditOption
-                onClick={() => {
-                  setIsEditBoardModalOpen(true);
-                  setIsOptionsOpen(false);
-                }}
-              >
-                Edit
-              </StyledEditOption>
-              <StyledDeleteOption
-                onClick={() => {
-                  setIsOptionsOpen(false);
-                  setIsDeleteBoardModalOpen(true);
-                }}
-              >
-                Delete
-              </StyledDeleteOption>
-            </StyledOptionsWrapper>
+            <MoreOptions
+              options={[
+                { text: "Edit", isDangerOption: false, onClick: () => setIsEditBoardModalOpen(true) },
+                { text: "Delete", isDangerOption: true, onClick: () => setIsDeleteBoardModalOpen(true) },
+              ]}
+            />
           )}
         </StyledActionsWrapper>
       </StyledMenuContentWrapper>
@@ -115,7 +93,6 @@ const Menu = ({ board }: MenuProps) => {
             onSubmit={(updatedBoard) => {
               // TODO
               // update bord data using data manager
-              console.log(updatedBoard);
               setIsEditBoardModalOpen(false);
             }}
           />

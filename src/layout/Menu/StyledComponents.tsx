@@ -1,4 +1,4 @@
-import styled, { css } from "styled-components";
+import styled from "styled-components";
 
 export const StyledMenuWrapper = styled.div`
   width: 100%;
@@ -103,59 +103,6 @@ export const StyledActionsWrapper = styled.div`
   gap: 1rem;
   position: relative;
   z-index: 3;
-`;
-
-export const StyledOptionsIconWrapper = styled.div`
-  color: ${(props) => props.theme.secondaryText};
-  &:hover {
-    cursor: pointer;
-    color: ${(props) => props.theme.mainPurple};
-  }
-`;
-
-export const StyledOptionsWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  align-content: center;
-  flex-wrap: wrap;
-  gap: 1rem;
-  position: absolute;
-  right: 0;
-  top: calc(100% + 1rem);
-  background-color: ${(props) => props.theme.secondaryBg};
-  width: 12rem;
-  height: 5.875rem;
-  border-radius: 0.5rem;
-`;
-
-export const styledOptionStyles = css`
-  width: 10rem;
-  font-size: 0.8125rem;
-  font-style: normal;
-  font-weight: 500;
-  line-height: 1.4375rem;
-
-  &:hover {
-    cursor: pointer;
-  }
-`;
-
-export const StyledEditOption = styled.div`
-  ${styledOptionStyles}
-  color: ${(props) => props.theme.secondaryText};
-  &:hover {
-    color: ${(props) => props.theme.primaryText};
-  }
-`;
-
-export const StyledDeleteOption = styled.div`
-  ${styledOptionStyles}
-  color: ${(props) => props.theme.red};
-  &:hover {
-    color: ${(props) => props.theme.redHover};
-  }
 `;
 
 // *** right side secrion -> end
