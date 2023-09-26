@@ -143,7 +143,7 @@ const UpdateOrCreateNewBoard = ({ onSubmit, initialValues = null }: UpdateOrCrea
                 }
               }}
             >
-              {isCreateMode ? "Create New Board" : "Save Chnages"}
+              {isCreateMode ? "Create New Board" : "Save Changes"}
             </ButtonPrimaryLarge>
           </div>
         </div>

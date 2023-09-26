@@ -1,4 +1,4 @@
-import { BoardDetails } from "@/types";
+import { BoardDetails, SubTask } from "@/types";
 import { StyledBoardWrapper, StyledColumnTasksWrapper, StyledNewColumn, StyledTask } from "./StyledComponents";
 import MediumHeading from "../typography/MediumHeading";
 import MediumBoldBodyText from "../typography/MediumBoldBodyText";
@@ -7,14 +7,22 @@ import withDroppable from "@/components/dnd/droppableHOC";
 import { DragDropContext, DropResult } from "@hello-pangea/dnd";
 import { useState } from "react";
 import _ from "lodash";
-import Modal from "../Modal";
-import TaskDetails from "../TaskDetails";
+import Modal from "@/components/Modal";
+import TaskDetails from "@/components/TaskDetails";
+import EditTask from "@/components/UpdateOrCreateNewTask";
 import { generateTemporaryId } from "@/util";
+import DeleteTask from "../DeleteTask";
 
 const Board = ({ details }: { details: BoardDetails }) => {
   const [boardColumns, setBoardColumns] = useState(details.columns);
 
-  const [selectedTask, setSelectedTask] = useState<null | { id: string; title: string; currentStatus: string }>(null);
+  const [selectedTask, setSelectedTask] = useState<null | {
+    id: string;
+    title: string;
+    description: string | null;
+    subtasks: SubTask[];
+    status: string;
+  }>(null);
   const [isTaskDetailsModalOpen, setIsTaskDetailsModalOpen] = useState(false);
   const [isEditTaskDetailsModalOpen, setIsEditTaskDetailsModalOpen] = useState(false);
   const [isDeleteTaskModalOpen, setIsDeleteTaskModalOpen] = useState(false);
@@ -84,7 +92,32 @@ const Board = ({ details }: { details: BoardDetails }) => {
                       return (
                         <StyledTask
                           onClick={() => {
-                            setSelectedTask({ id: task.id, title: task.title, currentStatus: column.id });
+                            setSelectedTask({
+                              id: task.id,
+                              title: task.title,
+                              description: "It's going to be a good day",
+                              status: column.id,
+                              subtasks: [
+                                {
+                                  id: generateTemporaryId(),
+                                  value: "Exercise like there is no tommorow",
+                                  isDone: false,
+                                  order: 1,
+                                },
+                                {
+                                  id: generateTemporaryId(),
+                                  value: "Avoid accidents during the workout",
+                                  isDone: true,
+                                  order: 2,
+                                },
+                                {
+                                  id: generateTemporaryId(),
+                                  value: "Get better at everything",
+                                  isDone: true,
+                                  order: 3,
+                                },
+                              ],
+                            });
                             setIsTaskDetailsModalOpen(true);
                           }}
                         >
@@ -116,13 +149,9 @@ const Board = ({ details }: { details: BoardDetails }) => {
             id={selectedTask.id}
             title={selectedTask.title}
             boardColumns={boardColumns}
-            status_={selectedTask.currentStatus}
-            description="random description"
-            subtasks_={[
-              { id: generateTemporaryId(), value: "Exercise like there is no tommorow", isDone: false, order: 1 },
-              { id: generateTemporaryId(), value: "Avoid accidents during the workout", isDone: true, order: 2 },
-              { id: generateTemporaryId(), value: "Get better at everything", isDone: true, order: 3 },
-            ]}
+            status_={selectedTask.status}
+            description={selectedTask.description}
+            subtasks_={selectedTask.subtasks}
             userActions={[
               {
                 title: "Edit",
@@ -145,10 +174,27 @@ const Board = ({ details }: { details: BoardDetails }) => {
         )}
       </Modal>
       <Modal isOpen={isEditTaskDetailsModalOpen} setIsOpen={setIsEditTaskDetailsModalOpen}>
-        <h1>Edit task</h1>
+        {selectedTask && (
+          <EditTask
+            onSubmit={(data) => {
+              console.log(data);
+              setIsEditTaskDetailsModalOpen(false);
+            }}
+            boardColumns={boardColumns}
+            initialValues={selectedTask}
+          />
+        )}
       </Modal>
       <Modal isOpen={isDeleteTaskModalOpen} setIsOpen={setIsDeleteTaskModalOpen}>
-        <h1>Delete task</h1>
+        {selectedTask && (
+          <DeleteTask
+            id={selectedTask.id}
+            title={selectedTask.title}
+            onSubmit={(id) => {
+              setIsDeleteTaskModalOpen(false);
+            }}
+          />
+        )}
       </Modal>
     </StyledBoardWrapper>
   );

@@ -39,14 +39,14 @@ type TextareaProps = {
   onChange: (x: string) => void;
   showErrorMessage: boolean;
   errorMessage?: string;
-  value: string;
+  value: string | null;
 };
 const Textarea = ({ placeholder, onChange, showErrorMessage, errorMessage = "", value = "" }: TextareaProps) => {
   const [isFocused, setIsFocused] = useState(false);
   return (
     <StyledTextareaWrapper $error={!isFocused && showErrorMessage} $errorMessage={errorMessage}>
       <StyledTextarea
-        value={value}
+        value={value || ""}
         placeholder={placeholder}
         onFocus={() => setIsFocused(true)}
         onBlur={() => setIsFocused(false)}

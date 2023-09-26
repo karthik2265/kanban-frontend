@@ -15,7 +15,7 @@ import {
 import DownArrowIcon from "@/components/icons/DownArrow";
 import { truncateText } from "@/util";
 import Modal from "@/components/Modal";
-import NewTask from "@/components/NewTask";
+import NewTask from "@/components/UpdateOrCreateNewTask";
 import EditBoard from "@/components/UpdateOrCreateNewBoard";
 import DeleteBoard from "@/components/DeleteBoard";
 import MoreOptions from "@/components/MoreOptions";

@@ -1,6 +1,5 @@
 import { styled } from "styled-components";
 import LargeHeading from "@/components/typography/LargeHeading";
-import { generateTemporaryId } from "@/util";
 import { useState } from "react";
 import { BoardColumn, SubTask } from "@/types";
 import MediumBoldBodyText from "../typography/MediumBoldBodyText";
@@ -39,7 +38,7 @@ const TaskDetails = ({
 }: {
   id: string;
   title: string;
-  description: string;
+  description: string | null;
   subtasks_: SubTask[];
   status_: string;
   userActions: { title: string; onClick: () => void; isDangerAction: boolean }[];
@@ -70,19 +69,21 @@ const TaskDetails = ({
           <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
             {subtasks.map((subtask) => {
               return (
-                <ReadonlySubTask
-                  text={subtask.value}
-                  id={subtask.id}
-                  isChecked={subtask.isDone}
-                  onToggle={(x) => {
-                    setSubtasks((prev) => {
-                      const updated = _.cloneDeep(prev);
-                      const subtask = updated.find((e) => e.id === x)!;
-                      subtask.isDone = !subtask.isDone;
-                      return updated;
-                    });
-                  }}
-                />
+                <div key={subtask.id}>
+                  <ReadonlySubTask
+                    text={subtask.value}
+                    id={subtask.id}
+                    isChecked={subtask.isDone}
+                    onToggle={(x) => {
+                      setSubtasks((prev) => {
+                        const updated = _.cloneDeep(prev);
+                        const subtask = updated.find((e) => e.id === x)!;
+                        subtask.isDone = !subtask.isDone;
+                        return updated;
+                      });
+                    }}
+                  />
+                </div>
               );
             })}
           </div>

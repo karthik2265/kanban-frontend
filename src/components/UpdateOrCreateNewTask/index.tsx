@@ -49,23 +49,29 @@ const StyledCrossIonWrapper = styled.div`
   }
 `;
 
-const NewTask = ({
+const UpdateOrCreateNewTask = ({
   boardColumns,
+  initialValues = null,
   onSubmit,
 }: {
   boardColumns: BoardColumn[];
+  initialValues?: null | { title: string; description: string | null; subtasks: SubTask[]; status: string };
   onSubmit: (data: {
     title: string;
     id: string;
-    description: string;
+    description: string | null;
     subtasks: Omit<SubTask, "isDone">[];
     columnId: string;
   }) => void;
 }) => {
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [subtasks, setSubtasks] = useState([{ id: generateTemporaryId(), value: "", order: 1 }]);
-  const [status, setStatus] = useState(boardColumns[0].id);
+  const isCreateMode = initialValues === null;
+  console.log(initialValues, "EditTask");
+  const [title, setTitle] = useState(isCreateMode ? "" : initialValues.title);
+  const [description, setDescription] = useState(isCreateMode ? null : initialValues.description);
+  const [subtasks, setSubtasks] = useState(
+    isCreateMode ? [{ id: generateTemporaryId(), value: "", order: 1 }] : initialValues.subtasks
+  );
+  const [status, setStatus] = useState(isCreateMode ? boardColumns[0].id : initialValues.status);
   const [isFormSubmitted, setIsFormSubmitted] = useState(false);
 
   function resetFormToInitialState() {
@@ -77,12 +83,12 @@ const NewTask = ({
   }
   return (
     <StyledWrapper>
-      <LargeHeading>New Task</LargeHeading>
+      <LargeHeading>{isCreateMode ? "Add New Task" : "Edit Task"}</LargeHeading>
       <form style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
         <StyledInputWrapper>
           <MediumBoldBodyText>Title</MediumBoldBodyText>
           <TextField
-            showErrorMessage={isFormSubmitted && title === ""}
+            showErrorMessage={isFormSubmitted && title.trim() === ""}
             errorMessage="Can't be empty"
             value={title}
             onChange={(x) => setTitle(x)}
@@ -116,7 +122,7 @@ const NewTask = ({
                         const newState = _.cloneDeep(prev);
                         prev.forEach((e) => {
                           if (e.id === subtask.id) {
-                            e.value = x;
+                            e.value = x.trim();
                           }
                         });
                         return newState;
@@ -142,7 +148,7 @@ const NewTask = ({
               onClick={() => {
                 setSubtasks((prev) => {
                   const updated = _.cloneDeep(prev);
-                  updated.push({ id: generateTemporaryId(), order: updated.length + 1, value: "" });
+                  updated.push({ id: generateTemporaryId(), order: updated.length + 1, value: "", isDone: false });
                   return updated;
                 });
               }}
@@ -174,11 +180,13 @@ const NewTask = ({
                   subtasks: data.subtasks,
                   columnId: data.status,
                 });
-                resetFormToInitialState();
+                if (isCreateMode) {
+                  resetFormToInitialState();
+                }
               }
             }}
           >
-            Create Task
+            {isCreateMode ? "Create Task" : "Save Changes"}
           </ButtonPrimarySmall>
         </div>
       </form>
@@ -194,7 +202,7 @@ function isFormDataValid({
   status,
 }: {
   title: string;
-  description: string;
+  description: string | null;
   subtasks: Omit<SubTask, "isDone">[];
   status: string;
 }) {
@@ -206,4 +214,4 @@ function isFormDataValid({
   return true;
 }
 
-export default NewTask;
+export default UpdateOrCreateNewTask;
