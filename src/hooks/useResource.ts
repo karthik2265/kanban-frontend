@@ -1,3 +1,0 @@
-/*
-handle loading and error states when fetching or updating data
-*/

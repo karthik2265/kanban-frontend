@@ -21,12 +21,9 @@ import DeleteBoard from "@/components/DeleteBoard";
 import MoreOptions from "@/components/MoreOptions";
 import LargeHeading from "@/components/typography/LargeHeading";
 import supabase from "@/supbaseClient";
+import { BoardContext } from "@/context/BoardContext";
 
-type MenuProps = {
-  board: Omit<Board, "order"> | null;
-};
-
-const Menu = ({ board }: MenuProps) => {
+const Menu = () => {
   const [user, setUser] = useState<null | { id: string }>(null);
 
   useEffect(() => {
@@ -51,8 +48,9 @@ const Menu = ({ board }: MenuProps) => {
     };
   }, []);
   const { isSecondaryMenuOpen, toggleSecondaryMenuVisibility } = useContext(RootLayoutContext)!;
+  const { boardDetails } = useContext(BoardContext)!;
   // modals
-  const [isNewTaskModalOpen, setIsNewTaskModalOpen] = useState(false);
+  // const [isNewTaskModalOpen, setIsNewTaskModalOpen] = useState(false);
   const [isEditBoardModalOpen, setIsEditBoardModalOpen] = useState(false);
   const [isDeleteBoardModalOpen, setIsDeleteBoardModalOpen] = useState(false);
   return (
@@ -68,7 +66,7 @@ const Menu = ({ board }: MenuProps) => {
             }
           }}
         >
-          <ExtraLargeHeading>{truncateText(board ? board.title : null, 25)}</ExtraLargeHeading>
+          <ExtraLargeHeading>{truncateText(boardDetails.data ? boardDetails.data.title : null, 25)}</ExtraLargeHeading>
           <StyledDownArrowIconWrapper $isSecondaryMenuOpen={isSecondaryMenuOpen}>
             <DownArrowIcon />
           </StyledDownArrowIconWrapper>
@@ -84,10 +82,10 @@ const Menu = ({ board }: MenuProps) => {
             <LargeHeading> {user ? `Profile` : "Login with github"}</LargeHeading>
           </div>
           <StyledAddNewTaskActionButton
-            $isAvailable={!!(board && board.columns)}
+            $isAvailable={!!(boardDetails.data && boardDetails.data.columns)}
             onClick={() => {
-              if (board && board.columns) {
-                setIsNewTaskModalOpen(true);
+              if (boardDetails.data && boardDetails.data.columns) {
+                // setIsNewTaskModalOpen(true);
               }
             }}
           >
@@ -96,7 +94,7 @@ const Menu = ({ board }: MenuProps) => {
               <span> Add New Task</span>
             </div>
           </StyledAddNewTaskActionButton>
-          {board && (
+          {boardDetails.data && (
             <MoreOptions
               options={[
                 { text: "Edit", isDangerOption: false, onClick: () => setIsEditBoardModalOpen(true) },
@@ -107,45 +105,15 @@ const Menu = ({ board }: MenuProps) => {
         </StyledActionsWrapper>
       </StyledMenuContentWrapper>
       {/* modals */}
-      <Modal isOpen={isNewTaskModalOpen} setIsOpen={setIsNewTaskModalOpen}>
-        {board && board.columns && (
-          <NewTask
-            boardColumns={board!.columns!}
-            onSubmit={(newtask) => {
-              setIsNewTaskModalOpen(false);
-              // TODO
-              // handle the data using data manager and show a notification
-            }}
-          />
-        )}
+      {/* <Modal isOpen={isNewTaskModalOpen} setIsOpen={setIsNewTaskModalOpen}>
+        {boardDetails.data && boardDetails.data.columns && <NewTask />}
       </Modal>
       <Modal isOpen={isEditBoardModalOpen} setIsOpen={setIsEditBoardModalOpen}>
-        {board && (
-          <EditBoard
-            initialValues={board}
-            onSubmit={(updatedBoard) => {
-              // TODO
-              // update bord data using data manager
-              setIsEditBoardModalOpen(false);
-            }}
-          />
-        )}
+        {boardDetails.data && <EditBoard />}
       </Modal>
       <Modal isOpen={isDeleteBoardModalOpen} setIsOpen={setIsDeleteBoardModalOpen}>
-        {board && (
-          <DeleteBoard
-            title={board.title}
-            id={board.id}
-            onSubmit={(id) => {
-              if (id) {
-                // TODO
-                // delete board and show a notification
-              }
-              setIsDeleteBoardModalOpen(false);
-            }}
-          />
-        )}
-      </Modal>
+        {boardDetails.data && <DeleteBoard />}
+      </Modal> */}
     </StyledMenuWrapper>
   );
 };

@@ -30,18 +30,10 @@ import { BoardContext } from "@/context/BoardContext";
 import { truncateText } from "@/util";
 import Modal from "@/components/Modal";
 
-type SecondaryMenuProps = {
-  boards: Board[];
-};
-
-type Board = {
-  title: string;
-  id: string;
-};
-const SecondaryMenu = ({ boards }: SecondaryMenuProps) => {
+const SecondaryMenu = () => {
   const { toggleTheme, currentTheme } = useContext(ThemeContext)!;
   const { toggleSecondaryMenuVisibility, isSecondaryMenuOpen } = useContext(RootLayoutContext)!;
-  const { selectedBoard, setSelectedBoard, boardDataManager } = useContext(BoardContext)!;
+  const { boards, boardDetails } = useContext(BoardContext)!;
   const [isCreateNewBoardModalOpen, setIsCreateNewBoardModalOpen] = useState(false);
   return (
     <StyledWrapper $isOpen={isSecondaryMenuOpen}>
@@ -49,22 +41,22 @@ const SecondaryMenu = ({ boards }: SecondaryMenuProps) => {
         <Logo />
       </StyledHeaderSection>
       <StyledMainSection>
-        <StyledBoardsHeader>{`ALL BOARDS (${boards.length})`}</StyledBoardsHeader>
-        {boards.map((board) => {
-          return (
-            <StyledSecondaryMenuAction
-              key={board.id}
-              onClick={() => {
-                toggleSecondaryMenuVisibility();
-                setSelectedBoard(board.id);
-              }}
-              $isActive={selectedBoard === board.id}
-            >
-              <BoardIcon />
-              <StyledBoardTitle>{truncateText(board.title, 15)}</StyledBoardTitle>
-            </StyledSecondaryMenuAction>
-          );
-        })}
+        <StyledBoardsHeader>{`ALL BOARDS (${boards.data ? boards.data.length : 0})`}</StyledBoardsHeader>
+        {boards.data &&
+          boards.data.map((board) => {
+            return (
+              <StyledSecondaryMenuAction
+                key={board.id}
+                onClick={() => {
+                  toggleSecondaryMenuVisibility();
+                }}
+                $isActive={board.id === boardDetails.data?.id}
+              >
+                <BoardIcon />
+                <StyledBoardTitle>{truncateText(board.title, 15)}</StyledBoardTitle>
+              </StyledSecondaryMenuAction>
+            );
+          })}
         <StyledSecondaryMenuAction
           onClick={() => {
             setIsCreateNewBoardModalOpen(true);
@@ -95,14 +87,7 @@ const SecondaryMenu = ({ boards }: SecondaryMenuProps) => {
       </StyledOpenSecondaryMenuButton>
       {/* create new board modal */}
       <Modal isOpen={isCreateNewBoardModalOpen} setIsOpen={setIsCreateNewBoardModalOpen}>
-        <CreateNewBoard
-          onSubmit={(newBoard) => {
-            boardDataManager.addBoard(newBoard);
-            setSelectedBoard(newBoard.id);
-            // TODO show notification baord created
-            setIsCreateNewBoardModalOpen(false);
-          }}
-        />
+        <CreateNewBoard />
       </Modal>
     </StyledWrapper>
   );

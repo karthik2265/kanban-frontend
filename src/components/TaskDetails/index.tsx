@@ -1,7 +1,7 @@
 import { styled } from "styled-components";
 import LargeHeading from "@/components/typography/LargeHeading";
 import { useState } from "react";
-import { BoardColumn, SubTask } from "@/types";
+import { BoardColumn, Subtask } from "@/types";
 import MediumBoldBodyText from "../typography/MediumBoldBodyText";
 import ReadonlySubTask from "../inputs/ReadonlySubTask";
 import Dropdown from "@/components/inputs/Dropdown";
@@ -39,7 +39,7 @@ const TaskDetails = ({
   id: string;
   title: string;
   description: string | null;
-  subtasks_: SubTask[];
+  subtasks_: Subtask[] | null;
   status_: string;
   userActions: { title: string; onClick: () => void; isDangerAction: boolean }[];
   boardColumns: BoardColumn[];
@@ -67,7 +67,7 @@ const TaskDetails = ({
             {`Subtasks (${subtasks.filter((x) => x.isDone).length} of ${subtasks.length})`}
           </MediumBoldBodyText>
           <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-            {subtasks.map((subtask) => {
+            {subtasks && subtasks.map((subtask) => {
               return (
                 <div key={subtask.id}>
                   <ReadonlySubTask
@@ -77,7 +77,7 @@ const TaskDetails = ({
                     onToggle={(x) => {
                       setSubtasks((prev) => {
                         const updated = _.cloneDeep(prev);
-                        const subtask = updated.find((e) => e.id === x)!;
+                        const subtask = updated!.find((e) => e.id === x)!;
                         subtask.isDone = !subtask.isDone;
                         return updated;
                       });

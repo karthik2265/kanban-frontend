@@ -67,48 +67,13 @@ const StyledSecondaryMenuBackground = styled.div<{ $isSecondaryMenuOpen: boolean
 `;
 
 const Layout = ({ children }: { children: ReactNode }) => {
-  // need to get this data from data manager
-  // remove initial data and get started it's getting too complicated
-  const boards = [
-    {
-      title: "Fatum",
-      id: "ggf",
-      columns: [
-        {
-          id: generateTemporaryId(),
-          title: "Todo",
-          tasks: [{ id: generateTemporaryId(), title: "Running", subTasksDone: 2, totalSubTasks: 4, order: 1 }],
-        },
-        {
-          id: generateTemporaryId(),
-          title: "Doing",
-          tasks: [
-            { id: generateTemporaryId(), title: "React web app", subTasksDone: 3, totalSubTasks: 12, order: 1 },
-            { id: generateTemporaryId(), title: "Supbase backend", subTasksDone: 5, totalSubTasks: 6, order: 2 },
-          ],
-        },
-      ],
-      isSelected: true,
-    },
-    { title: "marketing", id: "ma", columns: null, isSelected: false },
-    {
-      title: "connect 4 what will happen if i have a long board name like this and even more text",
-      id: "c4",
-      columns: null,
-      isSelected: false,
-    },
-  ];
   const { isSecondaryMenuOpen, toggleSecondaryMenuVisibility } = useContext(RootLayoutContext)!;
-  const { selectedBoard, setSelectedBoard, boardDataManager } = useContext(BoardContext)!;
-  // use custom hook
-  // const [boards, setBoards] = useState(() => {
-    
-  // })
+
   return (
     <StyledLayoutWrapper>
-      <SecondaryMenu boards={boards} />
+      <SecondaryMenu />
       <StyledMenuAndContentWrapper $isSecondaryMenuOpen={isSecondaryMenuOpen}>
-        <Menu board={selectedBoard ? boards.find((x) => x.id === selectedBoard)! : null} />
+        <Menu />
         <StyledContentWrapper>{children}</StyledContentWrapper>
       </StyledMenuAndContentWrapper>
       <StyledSecondaryMenuBackground

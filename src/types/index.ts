@@ -1,14 +1,16 @@
 export type Board = {
   id: string;
   title: string;
-  columns?: BoardColumn[] | null;
   order: number;
+  isSelected: boolean;
 };
 
 export type BoardDetails = {
+  id: string;
+  title: string;
   columns: (BoardColumn & {
-    tasks: { id: string; title: string; order: number; subTasksDone: number; totalSubTasks: number }[];
-  })[];
+    tasks: Task[] | null;
+  })[] | null;
 };
 
 export type BoardColumn = {
@@ -20,13 +22,15 @@ export type BoardColumn = {
 export type Task = {
   id: string;
   title: string;
-  description?: string | null;
-  subTasks?: SubTask[] | null;
+  columnId: string;
+  description: string | null;
+  subtasks: Subtask[] | null;
   order: number;
 };
 
-export type SubTask = {
+export type Subtask = {
   id: string;
+  taskId: string;
   value: string;
   isDone: boolean;
   order: number;

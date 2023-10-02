@@ -1,40 +1,36 @@
-import { Board } from "@/types";
+import { Board, BoardDetails } from "@/types";
 import IBoardStorageStrategy from "./IBoardStorageStrategy";
 
 class BoardLocalStorageStrategy implements IBoardStorageStrategy {
   boardsCount: number = 0;
-  getAllBoards() {
-    let boards: Board[] | null = null;
-    if (localStorage.getItem("boards")) {
-      boards = JSON.parse(localStorage.getItem("boards")!);
-      if (boards) {
-        this.boardsCount = boards.length;
-      }
-    }
-    return boards;
-  }
 
-  addBoard(board: Board) {
+  async addBoard(board: Board) {
     if (!localStorage.getItem("boards")) {
       localStorage.setItem("boards", "[]");
     }
     const boards: Board[] = JSON.parse(localStorage.getItem("boards")!);
-    boards.push(board);
-    localStorage.setItem("boards", JSON.stringify(boards));
     this.boardsCount++;
-    return board;
+    const newBoard = { ...board, order: this.boardsCount, isSelected: true };
+    boards.push(newBoard);
+    localStorage.setItem("boards", JSON.stringify(boards));
+    return newBoard;
   }
 
-  updateBoard(boardToBeUpdated: Board) {
-    if (!localStorage.getItem("boards")) {
-      localStorage.setItem("boards", "[]");
+  async getInitialData() {
+    let boards: Board[] | null = null;
+    let boardDetails: BoardDetails | null = null;
+    boards = JSON.parse(localStorage.getItem("boards") || "") || null;
+    boardDetails = JSON.parse(localStorage.getItem("boardDetails") || "") || null;
+    if (boards) {
+      this.boardsCount = boards.length;
     }
-    const boards: Board[] = JSON.parse(localStorage.getItem("boards")!);
-    const updatedBoards = boards.map((board) => {
-      if (board.id === boardToBeUpdated.id) return boardToBeUpdated;
-      return board;
-    });
-    localStorage.setItem("boards", JSON.stringify(updatedBoards));
+    return { boards, boardDetails };
+  }
+
+  async;
+
+  async updateBoard(boardToBeUpdated: BoardDetails) {
+    localStorage.setItem("boardDetails", JSON.stringify(boardToBeUpdated));
     return boardToBeUpdated;
   }
 }

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { Board, BoardColumn } from "@/types";
 import styled from "styled-components";
 import { generateTemporaryId } from "@/util";
@@ -9,6 +9,7 @@ import TextField from "@/components/inputs/TextField";
 import ButtonPrimaryLarge from "@/components/buttons/ButtonPrimaryLarge";
 import ButtonSecondary from "@/components/buttons/ButtonSecondary";
 import CrossIcon from "@/components/icons/Cross";
+import { BoardContext } from "@/context/BoardContext";
 
 const StyledWrapper = styled.div`
   border-radius: 0.375rem;
@@ -68,6 +69,7 @@ const UpdateOrCreateNewBoard = ({ onSubmit, initialValues = null }: UpdateOrCrea
     return initialValues.columns;
   });
   const [isFormSubmitted, setIsFormSubmitted] = useState(false);
+  const { addBoard } = useContext(BoardContext)!;
   return (
     <StyledWrapper>
       <LargeHeading>{isCreateMode ? "Add New Board" : "Edit Board"}</LargeHeading>
@@ -137,9 +139,9 @@ const UpdateOrCreateNewBoard = ({ onSubmit, initialValues = null }: UpdateOrCrea
               onClick={() => {
                 setIsFormSubmitted(true);
                 if (isDataValid({ title, columns })) {
-                  onSubmit({ title, columns, id: generateTemporaryId() });
-                } else {
-                  // TODO show notification form is not valid
+                  if (isCreateMode) {
+                    addBoard({ title, id: generateTemporaryId(), columns, isSelected: true });
+                  }
                 }
               }}
             >

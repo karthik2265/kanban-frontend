@@ -7,7 +7,7 @@ import MediumBoldBodyText from "@/components/typography/MediumBoldBodyText";
 import TextField from "@/components/inputs/TextField";
 import CrossIcon from "@/components/icons/Cross";
 import ButtonSecondary from "../buttons/ButtonSecondary";
-import { BoardColumn, SubTask } from "@/types";
+import { BoardColumn, Subtask, Task } from "@/types";
 import Dropdown from "@/components/inputs/Dropdown";
 import ButtonPrimarySmall from "@/components/buttons/ButtonPrimarySmall";
 import Textarea from "@/components/inputs/Textarea";
@@ -49,35 +49,22 @@ const StyledCrossIonWrapper = styled.div`
   }
 `;
 
-const UpdateOrCreateNewTask = ({
-  boardColumns,
-  initialValues = null,
-  onSubmit,
-}: {
-  boardColumns: BoardColumn[];
-  initialValues?: null | { title: string; description: string | null; subtasks: SubTask[]; status: string };
-  onSubmit: (data: {
-    title: string;
-    id: string;
-    description: string | null;
-    subtasks: Omit<SubTask, "isDone">[];
-    columnId: string;
-  }) => void;
-}) => {
+const UpdateOrCreateNewTask = ({ initialValues = null }: { initialValues?: null | Omit<Task, "order"> }) => {
   const isCreateMode = initialValues === null;
   console.log(initialValues, "EditTask");
   const [title, setTitle] = useState(isCreateMode ? "" : initialValues.title);
-  const [description, setDescription] = useState(isCreateMode ? null : initialValues.description);
+  const [taskId, setTaskId] = useState(isCreateMode ? generateTemporaryId() : initialValues.id);
+  const [description, setDescription] = useState<null | string>(isCreateMode ? null : initialValues.description);
   const [subtasks, setSubtasks] = useState(
-    isCreateMode ? [{ id: generateTemporaryId(), value: "", order: 1 }] : initialValues.subtasks
+    isCreateMode ? [{ id: generateTemporaryId(), value: "", order: 1, isDone: false, taskId }] : initialValues.subtasks
   );
-  const [status, setStatus] = useState(isCreateMode ? boardColumns[0].id : initialValues.status);
+  const [status, setStatus] = useState(isCreateMode ? boardColumns[0].id : initialValues.columnId);
   const [isFormSubmitted, setIsFormSubmitted] = useState(false);
 
   function resetFormToInitialState() {
     setTitle("");
     setDescription("");
-    setSubtasks([{ id: generateTemporaryId(), value: "", order: 1 }]);
+    setSubtasks([{ id: generateTemporaryId(), value: "", order: 1, isDone: false, taskId }]);
     setStatus(boardColumns[0].id);
     setIsFormSubmitted(false);
   }
@@ -101,7 +88,7 @@ const UpdateOrCreateNewTask = ({
             <Textarea
               showErrorMessage={false}
               placeholder="e.g. It’s always good to take a break. This 15 minute break will recharge the batteries a little."
-              value={description}
+              value={description as null}
               onChange={(x) => setDescription(x)}
             />
           </div>
@@ -109,46 +96,53 @@ const UpdateOrCreateNewTask = ({
         <StyledInputWrapper>
           <MediumBoldBodyText>Subtasks</MediumBoldBodyText>
           <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
-            {subtasks.map((subtask) => {
-              return (
-                <div key={subtask.id} style={{ display: "flex", gap: "1rem", alignItems: "center" }}>
-                  <TextField
-                    placeholder="e.g Make coffe"
-                    showErrorMessage={isFormSubmitted && subtask.value === ""}
-                    errorMessage="Can't be empty"
-                    value={subtask.value}
-                    onChange={(x) => {
-                      setSubtasks((prev) => {
-                        const newState = _.cloneDeep(prev);
-                        prev.forEach((e) => {
-                          if (e.id === subtask.id) {
-                            e.value = x.trim();
-                          }
+            {subtasks &&
+              subtasks.map((subtask) => {
+                return (
+                  <div key={subtask.id} style={{ display: "flex", gap: "1rem", alignItems: "center" }}>
+                    <TextField
+                      placeholder="e.g Make coffe"
+                      showErrorMessage={isFormSubmitted && subtask.value === ""}
+                      errorMessage="Can't be empty"
+                      value={subtask.value}
+                      onChange={(x) => {
+                        setSubtasks((prev) => {
+                          const newState = _.cloneDeep(prev);
+                          prev!.forEach((e) => {
+                            if (e.id === subtask.id) {
+                              e.value = x.trim();
+                            }
+                          });
+                          return newState;
                         });
-                        return newState;
-                      });
-                    }}
-                  />
-                  <StyledCrossIonWrapper
-                    onClick={() => {
-                      setSubtasks((prev) => {
-                        const updated = _.cloneDeep(prev);
-                        return updated.filter((x) => x.id !== subtask.id);
-                      });
-                    }}
-                  >
-                    <CrossIcon />
-                  </StyledCrossIonWrapper>
-                </div>
-              );
-            })}
+                      }}
+                    />
+                    <StyledCrossIonWrapper
+                      onClick={() => {
+                        setSubtasks((prev) => {
+                          const updated = _.cloneDeep(prev);
+                          return updated!.filter((x) => x.id !== subtask.id);
+                        });
+                      }}
+                    >
+                      <CrossIcon />
+                    </StyledCrossIonWrapper>
+                  </div>
+                );
+              })}
           </div>
           <div style={{ marginTop: "0.5rem" }}>
             <ButtonSecondary
               onClick={() => {
                 setSubtasks((prev) => {
-                  const updated = _.cloneDeep(prev);
-                  updated.push({ id: generateTemporaryId(), order: updated.length + 1, value: "", isDone: false });
+                  const updated = _.cloneDeep(prev) || [];
+                  updated.push({
+                    id: generateTemporaryId(),
+                    order: updated.length + 1,
+                    value: "",
+                    isDone: false,
+                    taskId,
+                  });
                   return updated;
                 });
               }}
@@ -180,6 +174,7 @@ const UpdateOrCreateNewTask = ({
                   subtasks: data.subtasks,
                   columnId: data.status,
                 });
+                
                 if (isCreateMode) {
                   resetFormToInitialState();
                 }
@@ -203,13 +198,15 @@ function isFormDataValid({
 }: {
   title: string;
   description: string | null;
-  subtasks: Omit<SubTask, "isDone">[];
+  subtasks: Subtask[] | null;
   status: string;
 }) {
   if (!title || !status) return false;
-  for (let i = 0; i < subtasks.length; i++) {
-    const subtask = subtasks[i];
-    if (subtask.value === "") return false;
+  if (subtasks) {
+    for (let i = 0; i < subtasks.length; i++) {
+      const subtask = subtasks[i];
+      if (subtask.value === "") return false;
+    }
   }
   return true;
 }

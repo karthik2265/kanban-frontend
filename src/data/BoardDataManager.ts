@@ -1,4 +1,4 @@
-import { Board } from "@/types";
+import {  Board, BoardDetails } from "@/types";
 import IBoardStorageStrategy from "./stratagies/IBoardStorageStrategy";
 
 export class BoardDataManager {
@@ -6,22 +6,25 @@ export class BoardDataManager {
 
   constructor(strategy: IBoardStorageStrategy) {
     this.strategy = strategy;
+    this.addBoard = this.addBoard.bind(this);
+    this.updateBoard = this.updateBoard.bind(this);
+    this.getInitialData = this.getInitialData.bind(this);
   }
 
   setStrategy(newStrategy: IBoardStorageStrategy) {
     this.strategy = newStrategy;
   }
 
-  addBoard(data: Board) {
+  addBoard(data: Omit<Board, "order">) {
     return this.strategy.addBoard(data);
   }
 
-  updateBoard(data: Board) {
+  updateBoard(data: BoardDetails) {
     return this.strategy.updateBoard(data);
   }
 
-  getAllBoards() {
-    return this.strategy.getAllBoards();
+  getInitialData() {
+    return this.strategy.getInitialData();
   }
 }
 

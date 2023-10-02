@@ -1,33 +1,31 @@
-import { BoardDetails, SubTask } from "@/types";
+import { useState, useContext } from "react";
+import { BoardDetails, Subtask, Task } from "@/types";
 import { StyledBoardWrapper, StyledColumnTasksWrapper, StyledNewColumn, StyledTask } from "./StyledComponents";
 import MediumHeading from "../typography/MediumHeading";
 import MediumBoldBodyText from "../typography/MediumBoldBodyText";
 import withDraggable from "@/components/dnd/draggableHOC";
 import withDroppable from "@/components/dnd/droppableHOC";
 import { DragDropContext, DropResult } from "@hello-pangea/dnd";
-import { useState } from "react";
 import _ from "lodash";
 import Modal from "@/components/Modal";
 import TaskDetails from "@/components/TaskDetails";
 import EditTask from "@/components/UpdateOrCreateNewTask";
-import { generateTemporaryId } from "@/util";
 import DeleteTask from "../DeleteTask";
+import { BoardContext } from "@/context/BoardContext";
 
-const Board = ({ details }: { details: BoardDetails }) => {
-  const [boardColumns, setBoardColumns] = useState(details.columns);
+const Board = () => {
+  const { boardDetails } = useContext(BoardContext)!;
+  const [boardColumns, setBoardColumns] = useState(() => {
+    if (boardDetails.data) {
+      return boardDetails.data.columns;
+    }
+    return null;
+  });
 
-  const [selectedTask, setSelectedTask] = useState<null | {
-    id: string;
-    title: string;
-    description: string | null;
-    subtasks: SubTask[];
-    status: string;
-  }>(null);
+  const [selectedTask, setSelectedTask] = useState<null | Task>(null);
   const [isTaskDetailsModalOpen, setIsTaskDetailsModalOpen] = useState(false);
   const [isEditTaskDetailsModalOpen, setIsEditTaskDetailsModalOpen] = useState(false);
   const [isDeleteTaskModalOpen, setIsDeleteTaskModalOpen] = useState(false);
-
-  // TODO data fetching for task details and update
 
   function dragEndEventHandler(result: DropResult) {
     // adjust order of tasks in columns based on where the task is dragged
@@ -42,7 +40,7 @@ const Board = ({ details }: { details: BoardDetails }) => {
       let destinationColumnIndex = -1;
       const tasknewIndex = destination.index;
       // find the task
-      boardColumns.forEach((column, columnIndex) => {
+      boardColumns!.forEach((column, columnIndex) => {
         if (destinationColumnId === column.id) {
           destinationColumnIndex = columnIndex;
         }
@@ -58,13 +56,13 @@ const Board = ({ details }: { details: BoardDetails }) => {
       setBoardColumns((previous) => {
         const columns = _.cloneDeep(previous);
         // delete the task
-        columns.forEach((column, columnIndex) => {
+        columns!.forEach((column, columnIndex) => {
           if (columnIndex === sourceColumnIndex) {
             column.tasks = column.tasks.filter((task) => task.id !== taskId);
           }
         });
         // add the task to new position
-        columns.forEach((column) => {
+        columns!.forEach((column) => {
           if (column.id === destinationColumnId) {
             column.tasks.splice(tasknewIndex, 0, task!);
           }
@@ -76,69 +74,47 @@ const Board = ({ details }: { details: BoardDetails }) => {
   return (
     <StyledBoardWrapper>
       <DragDropContext onDragEnd={dragEndEventHandler}>
-        {boardColumns.map((column) => {
-          const Column = () => {
-            return (
-              <div key={column.id}>
-                <div style={{ marginBottom: "1.25rem" }}>
-                  <MediumBoldBodyText
-                    isPrimary={false}
-                  >{`${column.title}  (${column.tasks.length})`}</MediumBoldBodyText>
+        {boardColumns &&
+          boardColumns.map((column) => {
+            const Column = () => {
+              return (
+                <div key={column.id}>
+                  <div style={{ marginBottom: "1.25rem" }}>
+                    <MediumBoldBodyText
+                      isPrimary={false}
+                    >{`${column.title}  (${column.tasks.length})`}</MediumBoldBodyText>
+                  </div>
+
+                  <StyledColumnTasksWrapper>
+                    {column.tasks.map((task, taskIndex) => {
+                      const Task = () => {
+                        const totalSubTasks = task.subtasks?.length || 0;
+                        const subTasksDone = task.subtasks && task.subtasks.filter((x) => x.isDone).length;
+                        return (
+                          <StyledTask
+                            onClick={() => {
+                              setSelectedTask(task);
+                              setIsTaskDetailsModalOpen(true);
+                            }}
+                          >
+                            <MediumHeading>{task.title}</MediumHeading>
+                            <MediumBoldBodyText isPrimary={false}>
+                              {totalSubTasks > 0 ? `${subTasksDone} of ${totalSubTasks} subtasks` : null}
+                            </MediumBoldBodyText>
+                          </StyledTask>
+                        );
+                      };
+                      const DraggableTask = withDraggable(Task, task.id, taskIndex);
+
+                      return <DraggableTask key={task.id} />;
+                    })}
+                  </StyledColumnTasksWrapper>
                 </div>
-
-                <StyledColumnTasksWrapper>
-                  {column.tasks.map((task, taskIndex) => {
-                    const Task = () => {
-                      return (
-                        <StyledTask
-                          onClick={() => {
-                            setSelectedTask({
-                              id: task.id,
-                              title: task.title,
-                              description: "It's going to be a good day",
-                              status: column.id,
-                              subtasks: [
-                                {
-                                  id: generateTemporaryId(),
-                                  value: "Exercise like there is no tommorow",
-                                  isDone: false,
-                                  order: 1,
-                                },
-                                {
-                                  id: generateTemporaryId(),
-                                  value: "Avoid accidents during the workout",
-                                  isDone: true,
-                                  order: 2,
-                                },
-                                {
-                                  id: generateTemporaryId(),
-                                  value: "Get better at everything",
-                                  isDone: true,
-                                  order: 3,
-                                },
-                              ],
-                            });
-                            setIsTaskDetailsModalOpen(true);
-                          }}
-                        >
-                          <MediumHeading>{task.title}</MediumHeading>
-                          <MediumBoldBodyText isPrimary={false}>
-                            {task.totalSubTasks > 0 ? `${task.subTasksDone} of ${task.totalSubTasks} subtasks` : null}
-                          </MediumBoldBodyText>
-                        </StyledTask>
-                      );
-                    };
-                    const DraggableTask = withDraggable(Task, task.id, taskIndex);
-
-                    return <DraggableTask key={task.id} />;
-                  })}
-                </StyledColumnTasksWrapper>
-              </div>
-            );
-          };
-          const DroppableColumn = withDroppable(Column, column.id);
-          return <DroppableColumn key={column.id} />;
-        })}
+              );
+            };
+            const DroppableColumn = withDroppable(Column, column.id);
+            return <DroppableColumn key={column.id} />;
+          })}
       </DragDropContext>
 
       <StyledNewColumn />
@@ -148,10 +124,10 @@ const Board = ({ details }: { details: BoardDetails }) => {
           <TaskDetails
             id={selectedTask.id}
             title={selectedTask.title}
-            boardColumns={boardColumns}
-            status_={selectedTask.status}
-            description={selectedTask.description}
-            subtasks_={selectedTask.subtasks}
+            boardColumns={boardColumns!}
+            status_={selectedTask.columnId}
+            description={selectedTask.description as null}
+            subtasks_={selectedTask.subtasks as null}
             userActions={[
               {
                 title: "Edit",
@@ -180,8 +156,8 @@ const Board = ({ details }: { details: BoardDetails }) => {
               console.log(data);
               setIsEditTaskDetailsModalOpen(false);
             }}
-            boardColumns={boardColumns}
-            initialValues={selectedTask}
+            boardColumns={boardColumns!}
+            initialValues={selectedTask!}
           />
         )}
       </Modal>
