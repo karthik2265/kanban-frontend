@@ -39,8 +39,8 @@ const StyledCrossIonWrapper = styled.div`
 `;
 
 type UpdateOrCreateNewBoardProps = {
-  onSubmit: (board: Omit<Board, "order">) => void;
-  initialValues?: Omit<Board, "order"> | null;
+  onSubmit: (board: Omit<Board & { columns: BoardColumn[] | null }, "order">) => void;
+  initialValues?: Omit<Board & { columns: BoardColumn[] | null }, "order"> | null;
 };
 
 const defaultColumns = [
@@ -61,7 +61,7 @@ function isDataValid({ title, columns }: { title: string; columns: BoardColumn[]
  some text and initial state of inputs depends on whether this 
  component is used in create mode or update mode 
 */
-const UpdateOrCreateNewBoard = ({ onSubmit, initialValues = null }: UpdateOrCreateNewBoardProps) => {
+const UpdateOrCreateNewBoard = ({ initialValues = null, onSubmit }: UpdateOrCreateNewBoardProps) => {
   const isCreateMode = initialValues === null;
   const [title, setTitle] = useState(isCreateMode ? "" : initialValues.title);
   const [columns, setColumns] = useState<BoardColumn[]>(() => {
@@ -139,9 +139,15 @@ const UpdateOrCreateNewBoard = ({ onSubmit, initialValues = null }: UpdateOrCrea
               onClick={() => {
                 setIsFormSubmitted(true);
                 if (isDataValid({ title, columns })) {
+                  const id = initialValues?.id || generateTemporaryId();
                   if (isCreateMode) {
-                    addBoard({ title, id: generateTemporaryId(), columns, isSelected: true });
+                    addBoard({ title, id, columns });
+                    // reset form to initial state
+                    setTitle("");
+                    setColumns(defaultColumns);
+                    setIsFormSubmitted(false);
                   }
+                  onSubmit({ id, title, columns });
                 }
               }}
             >

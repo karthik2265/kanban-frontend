@@ -1,5 +1,5 @@
 import { ReactNode, createContext, useCallback, useContext, useEffect, useReducer } from "react";
-import { Board, BoardDetails, Task } from "@/types";
+import { Board, BoardColumn, BoardDetails, Task } from "@/types";
 import _ from "lodash";
 import useData from "@/hooks/useData";
 import { DataContext } from "./DataContext";
@@ -8,7 +8,8 @@ const BoardContext = createContext<null | {
   boards: State["boards"];
   boardDetails: State["boardDetails"];
   task: State["task"];
-  addBoard: (board: Omit<Board, "order">) => void;
+  addBoard: (board: Omit<Board & { columns: BoardColumn[] | null }, "order">) => void;
+  updateSelectedBoardAndFetchBoardDetails: (id: string) => void;
 }>(null);
 
 type Action =
@@ -35,7 +36,7 @@ type Action =
   | {
       type: "ADD_BOARD";
       payload: {
-        data: Board | null;
+        data: (Board & { columns: BoardColumn[] | null }) | null;
         isProcessing: boolean;
         error: null | string;
       };
@@ -126,26 +127,35 @@ function BoardContextProvider({ children }: { children: ReactNode }) {
     fetchInitialData();
   }, []);
 
+  // add board
+  const { startProcessing: addBoard } = useData<
+    Board & { columns: BoardColumn[] | null },
+    Omit<Board & { columns: BoardColumn[] | null }, "order">
+  >(boardDataManager.addBoard, (s) => {
+    dispatch({ type: "ADD_BOARD", payload: { ...s } });
+  });
+
   // update selected board meaning have to fetch board details also
   const { startProcessing: fetchBoardDetails } = useData<BoardDetails, string>(
-    boardDataManager.updateBoard,
+    boardDataManager.getBoardDetails,
     (s) => {
       dispatch({ type: "UPDATE_BOARD_DETAILS", payload: { ...s } });
     }
   );
-  const updateBoard = useCallback((board: BoardDetails) => {
-    updateBoardData(board);
-  }, []);
 
-  // add board
-  const { startProcessing: addBoard } = useData<Board, Board>(boardDataManager.addBoard, (s) => {
-    dispatch({ type: "ADD_BOARD", payload: { ...s } });
-  });
+  function updateSelectedBoardAndFetchBoardDetails(id: string) {
+    fetchBoardDetails(id);
+  }
 
-  // add or update task
   return (
     <BoardContext.Provider
-      value={{ boards: state.boards, boardDetails: state.boardDetails, task: state.task, addBoard }}
+      value={{
+        boards: state.boards,
+        boardDetails: state.boardDetails,
+        task: state.task,
+        addBoard,
+        updateSelectedBoardAndFetchBoardDetails,
+      }}
     >
       {children}
     </BoardContext.Provider>

@@ -2,7 +2,6 @@ export type Board = {
   id: string;
   title: string;
   order: number;
-  isSelected: boolean;
 };
 
 export type BoardDetails = {

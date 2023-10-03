@@ -33,7 +33,7 @@ import Modal from "@/components/Modal";
 const SecondaryMenu = () => {
   const { toggleTheme, currentTheme } = useContext(ThemeContext)!;
   const { toggleSecondaryMenuVisibility, isSecondaryMenuOpen } = useContext(RootLayoutContext)!;
-  const { boards, boardDetails } = useContext(BoardContext)!;
+  const { boards, boardDetails, updateSelectedBoardAndFetchBoardDetails } = useContext(BoardContext)!;
   const [isCreateNewBoardModalOpen, setIsCreateNewBoardModalOpen] = useState(false);
   return (
     <StyledWrapper $isOpen={isSecondaryMenuOpen}>
@@ -49,6 +49,7 @@ const SecondaryMenu = () => {
                 key={board.id}
                 onClick={() => {
                   toggleSecondaryMenuVisibility();
+                  updateSelectedBoardAndFetchBoardDetails(board.id);
                 }}
                 $isActive={board.id === boardDetails.data?.id}
               >
@@ -87,7 +88,7 @@ const SecondaryMenu = () => {
       </StyledOpenSecondaryMenuButton>
       {/* create new board modal */}
       <Modal isOpen={isCreateNewBoardModalOpen} setIsOpen={setIsCreateNewBoardModalOpen}>
-        <CreateNewBoard />
+        <CreateNewBoard onSubmit={() => setIsCreateNewBoardModalOpen(false)} />
       </Modal>
     </StyledWrapper>
   );
@@ -96,6 +97,5 @@ const SecondaryMenu = () => {
 export default SecondaryMenu;
 
 // TODO
-// * Show board name only first 50 chars or something to that effect
 // * Draggable feature to arrange boards according to user preference
 // * modulurize styled components

@@ -12,8 +12,6 @@ import SecondaryMenu from "@/layout/SecondaryMenu";
 import { RootLayoutContext } from "@/context/RootLayoutContext";
 import { styled } from "styled-components";
 import Menu from "./Menu";
-import { BoardContext } from "@/context/BoardContext";
-import { generateTemporaryId } from "@/util";
 
 const StyledMenuAndContentWrapper = styled.div<{ $isSecondaryMenuOpen: boolean }>`
   position: fixed;

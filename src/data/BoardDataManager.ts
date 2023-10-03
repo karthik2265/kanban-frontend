@@ -1,4 +1,4 @@
-import {  Board, BoardDetails } from "@/types";
+import { Board, BoardColumn, BoardDetails } from "@/types";
 import IBoardStorageStrategy from "./stratagies/IBoardStorageStrategy";
 
 export class BoardDataManager {
@@ -9,13 +9,14 @@ export class BoardDataManager {
     this.addBoard = this.addBoard.bind(this);
     this.updateBoard = this.updateBoard.bind(this);
     this.getInitialData = this.getInitialData.bind(this);
+    this.getBoardDetails = this.getBoardDetails.bind(this);
   }
 
   setStrategy(newStrategy: IBoardStorageStrategy) {
     this.strategy = newStrategy;
   }
 
-  addBoard(data: Omit<Board, "order">) {
+  addBoard(data: Omit<Board & { columns: BoardColumn[] | null }, "order">) {
     return this.strategy.addBoard(data);
   }
 
@@ -25,6 +26,10 @@ export class BoardDataManager {
 
   getInitialData() {
     return this.strategy.getInitialData();
+  }
+
+  getBoardDetails(id: string) {
+    return this.strategy.getBoardDetails(id);
   }
 }
 
