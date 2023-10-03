@@ -7,6 +7,9 @@ interface IBoardStorageStrategy {
   addBoard(
     board: Omit<Board & { columns: BoardColumn[] | null }, "order">
   ): Promise<Board & { columns: BoardColumn[] | null }>;
+  editBoard(
+    board: Omit<Board & { columns: BoardColumn[] | null }, "order">
+  ): Promise<Board & { columns: BoardColumn[] | null }>;
   getBoardDetails(id: string): Promise<BoardDetails>;
   // addTaskToBoard(boardId: string, taskData: TaskData): ReturnType;
   // updateTaskInBoard(boardId: string, taskId: string, taskData: TaskData): ReturnType;

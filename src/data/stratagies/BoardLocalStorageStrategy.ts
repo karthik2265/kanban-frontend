@@ -17,6 +17,39 @@ class BoardLocalStorageStrategy implements IBoardStorageStrategy {
     return newBoard;
   }
 
+  async editBoard(board: Board & { columns: BoardColumn[] | null }) {
+    if (!localStorage.getItem("boards")) {
+      localStorage.setItem("boards", "[]");
+    }
+    const boards: (Board & { columns: BoardColumn[] | null })[] = JSON.parse(localStorage.getItem("boards")!);
+    boards.forEach((x) => {
+      if (x.id === board.id) {
+        x.title = board.title;
+        x.order = board.order;
+        if (x.columns) {
+          x.columns.forEach((c, i) => {
+            const updatedColumn = board.columns?.find((x) => x.id === c.id);
+            if (updatedColumn) {
+              c.title = updatedColumn.title;
+            } else {
+              x.columns?.splice(i, 1);
+            }
+          });
+          // new columns
+          const newColumns = board.columns?.filter((c) => !x.columns?.some((k) => k.id === c.id));
+          if (newColumns) {
+            x.columns.push(...newColumns);
+          }
+        } else {
+          x.columns = board.columns;
+        }
+        localStorage.setItem("boards", JSON.stringify(boards));
+        localStorage.setItem("boardDetails", JSON.stringify(x));
+      }
+    });
+    return board;
+  }
+
   async getInitialData() {
     let boards: Board[] | null = null;
     let boardDetails: BoardDetails | null = null;

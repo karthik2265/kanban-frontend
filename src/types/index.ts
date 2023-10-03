@@ -8,7 +8,7 @@ export type BoardDetails = {
   id: string;
   title: string;
   columns: (BoardColumn & {
-    tasks: Task[] | null;
+    tasks?: Task[] | null | undefined;
   })[] | null;
 };
 

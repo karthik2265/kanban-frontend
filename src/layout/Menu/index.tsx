@@ -48,7 +48,7 @@ const Menu = () => {
     };
   }, []);
   const { isSecondaryMenuOpen, toggleSecondaryMenuVisibility } = useContext(RootLayoutContext)!;
-  const { boardDetails } = useContext(BoardContext)!;
+  const { boardDetails, editBoard } = useContext(BoardContext)!;
   // modals
   // const [isNewTaskModalOpen, setIsNewTaskModalOpen] = useState(false);
   const [isEditBoardModalOpen, setIsEditBoardModalOpen] = useState(false);
@@ -107,11 +107,19 @@ const Menu = () => {
       {/* modals */}
       {/* <Modal isOpen={isNewTaskModalOpen} setIsOpen={setIsNewTaskModalOpen}>
         {boardDetails.data && boardDetails.data.columns && <NewTask />}
-      </Modal>
+      </Modal> */}
       <Modal isOpen={isEditBoardModalOpen} setIsOpen={setIsEditBoardModalOpen}>
-        {boardDetails.data && <EditBoard />}
+        {boardDetails.data && (
+          <EditBoard
+            initialValues={boardDetails.data}
+            onSubmit={(board) => {
+              editBoard(board);
+              setIsEditBoardModalOpen(false);
+            }}
+          />
+        )}
       </Modal>
-      <Modal isOpen={isDeleteBoardModalOpen} setIsOpen={setIsDeleteBoardModalOpen}>
+      {/* <Modal isOpen={isDeleteBoardModalOpen} setIsOpen={setIsDeleteBoardModalOpen}>
         {boardDetails.data && <DeleteBoard />}
       </Modal> */}
     </StyledMenuWrapper>

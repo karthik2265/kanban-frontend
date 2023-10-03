@@ -7,6 +7,7 @@ export class BoardDataManager {
   constructor(strategy: IBoardStorageStrategy) {
     this.strategy = strategy;
     this.addBoard = this.addBoard.bind(this);
+    this.editBoard = this.editBoard.bind(this);
     this.updateBoard = this.updateBoard.bind(this);
     this.getInitialData = this.getInitialData.bind(this);
     this.getBoardDetails = this.getBoardDetails.bind(this);
@@ -18,6 +19,10 @@ export class BoardDataManager {
 
   addBoard(data: Omit<Board & { columns: BoardColumn[] | null }, "order">) {
     return this.strategy.addBoard(data);
+  }
+
+  editBoard(data: Board & { columns: BoardColumn[] | null }) {
+    return this.strategy.editBoard(data);
   }
 
   updateBoard(data: BoardDetails) {

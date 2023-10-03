@@ -9,6 +9,7 @@ const BoardContext = createContext<null | {
   boardDetails: State["boardDetails"];
   task: State["task"];
   addBoard: (board: Omit<Board & { columns: BoardColumn[] | null }, "order">) => void;
+  editBoard: (board: Omit<Board, "order"> & { columns: BoardColumn[] | null }) => void;
   updateSelectedBoardAndFetchBoardDetails: (id: string) => void;
 }>(null);
 
@@ -35,6 +36,14 @@ type Action =
     }
   | {
       type: "ADD_BOARD";
+      payload: {
+        data: (Board & { columns: BoardColumn[] | null }) | null;
+        isProcessing: boolean;
+        error: null | string;
+      };
+    }
+  | {
+      type: "EDIT_BOARD";
       payload: {
         data: (Board & { columns: BoardColumn[] | null }) | null;
         isProcessing: boolean;
@@ -96,6 +105,38 @@ function reducer(state: State, action: Action) {
       updatedState.boards.isProcessing = action.payload.isProcessing;
       updatedState.boards.error = action.payload.error;
       break;
+    case "EDIT_BOARD":
+      if (action.payload.data) {
+        const boards = updatedState.boards.data;
+        const board = action.payload.data;
+        boards?.forEach((x) => {
+          if (x.id === board.id) {
+            x.title = board.title;
+            x.order = board.order;
+          }
+        });
+        const boardDetails = updatedState.boardDetails.data;
+        if (boardDetails?.columns) {
+          boardDetails?.columns?.forEach((c, i) => {
+            const updatedColumn = board.columns?.find((x) => x.id === c.id);
+            if (updatedColumn) {
+              c.order = updatedColumn.order;
+              c.title = updatedColumn.title;
+            } else {
+              boardDetails.columns?.splice(i, 1);
+            }
+          });
+          const newColumns = board.columns?.filter((c) => !boardDetails.columns?.some((k) => k.id === c.id));
+          if (newColumns) {
+            boardDetails.columns.push(...newColumns);
+          }
+        } else {
+          boardDetails!.columns = board.columns as null;
+        }
+      }
+      updatedState.boardDetails.error = action.payload.error;
+      updatedState.boardDetails.isProcessing = action.payload.isProcessing;
+      break;
     case "UPDATE_BOARD_DETAILS":
       updatedState.boardDetails = { ...action.payload };
       break;
@@ -147,6 +188,14 @@ function BoardContextProvider({ children }: { children: ReactNode }) {
     fetchBoardDetails(id);
   }
 
+  // edit board
+  const { startProcessing: editBoard } = useData<
+    Board & { columns: BoardColumn[] | null },
+    Board & { columns: BoardColumn[] | null }
+  >(boardDataManager.editBoard, (s) => {
+    // will edit both boards and board details
+    dispatch({ type: "EDIT_BOARD", payload: { ...s } });
+  });
   return (
     <BoardContext.Provider
       value={{
@@ -154,6 +203,7 @@ function BoardContextProvider({ children }: { children: ReactNode }) {
         boardDetails: state.boardDetails,
         task: state.task,
         addBoard,
+        editBoard,
         updateSelectedBoardAndFetchBoardDetails,
       }}
     >
