@@ -39,7 +39,7 @@ const StyledCrossIonWrapper = styled.div`
 `;
 
 type UpdateOrCreateNewBoardProps = {
-  onSubmit: (board: Omit<Board & { columns: BoardColumn[] | null }, "order">) => void;
+  onSubmit: (board: Board & { columns: BoardColumn[] | null }) => void;
   initialValues?: Omit<Board & { columns: BoardColumn[] | null }, "order"> | null;
 };
 
@@ -69,7 +69,7 @@ const UpdateOrCreateNewBoard = ({ initialValues = null, onSubmit }: UpdateOrCrea
     return initialValues.columns;
   });
   const [isFormSubmitted, setIsFormSubmitted] = useState(false);
-  const { addBoard } = useContext(BoardContext)!;
+  const { addBoard, boards } = useContext(BoardContext)!;
   return (
     <StyledWrapper>
       <LargeHeading>{isCreateMode ? "Add New Board" : "Edit Board"}</LargeHeading>
@@ -147,7 +147,7 @@ const UpdateOrCreateNewBoard = ({ initialValues = null, onSubmit }: UpdateOrCrea
                     setColumns(defaultColumns);
                     setIsFormSubmitted(false);
                   }
-                  onSubmit({ id, title, columns });
+                  onSubmit({ id, title, columns, order: boards.data?.length || 1 });
                 }
               }}
             >

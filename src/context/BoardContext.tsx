@@ -8,8 +8,9 @@ const BoardContext = createContext<null | {
   boards: State["boards"];
   boardDetails: State["boardDetails"];
   task: State["task"];
-  addBoard: (board: Omit<Board & { columns: BoardColumn[] | null }, "order">) => void;
-  editBoard: (board: Omit<Board, "order"> & { columns: BoardColumn[] | null }) => void;
+  addBoard: (board: Omit<Board, "order"> & { columns: BoardColumn[] | null }) => void;
+  editBoard: (board: Board & { columns: BoardColumn[] | null }) => void;
+  deleteBoard: (id: string) => void;
   updateSelectedBoardAndFetchBoardDetails: (id: string) => void;
 }>(null);
 
@@ -27,14 +28,6 @@ type Action =
       };
     }
   | {
-      type: "UPDATE_TASK";
-      payload: {
-        data: Task | null;
-        isProcessing: boolean;
-        error: null | string;
-      };
-    }
-  | {
       type: "ADD_BOARD";
       payload: {
         data: (Board & { columns: BoardColumn[] | null }) | null;
@@ -46,6 +39,22 @@ type Action =
       type: "EDIT_BOARD";
       payload: {
         data: (Board & { columns: BoardColumn[] | null }) | null;
+        isProcessing: boolean;
+        error: null | string;
+      };
+    }
+  | {
+      type: "DELETE_BOARD";
+      payload: {
+        data: { deletedBoardId: string; boardDetails: BoardDetails | null } | null;
+        isProcessing: boolean;
+        error: null | string;
+      };
+    }
+  | {
+      type: "UPDATE_TASK";
+      payload: {
+        data: Task | null;
         isProcessing: boolean;
         error: null | string;
       };
@@ -93,6 +102,9 @@ function reducer(state: State, action: Action) {
     case "UPDATE_BOARDS":
       updatedState.boards = { ...action.payload };
       break;
+    case "UPDATE_BOARD_DETAILS":
+      updatedState.boardDetails = { ...action.payload };
+      break;
     case "ADD_BOARD":
       if (!updatedState.boards.data) {
         updatedState.boards.data = [];
@@ -137,8 +149,16 @@ function reducer(state: State, action: Action) {
       updatedState.boardDetails.error = action.payload.error;
       updatedState.boardDetails.isProcessing = action.payload.isProcessing;
       break;
-    case "UPDATE_BOARD_DETAILS":
-      updatedState.boardDetails = { ...action.payload };
+    case "DELETE_BOARD":
+      if (action.payload.data) {
+        // delete the board
+        updatedState.boards.data =
+          updatedState.boards.data?.filter((b) => b.id !== action.payload.data?.deletedBoardId) || null;
+        // select another board
+        updatedState.boardDetails.data = action.payload.data.boardDetails;
+      }
+      updatedState.boardDetails.error = action.payload.error;
+      updatedState.boardDetails.isProcessing = action.payload.isProcessing;
       break;
     case "UPDATE_TASK":
       updatedState.task = { ...action.payload };
@@ -154,7 +174,6 @@ function reducer(state: State, action: Action) {
 function BoardContextProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(reducer, initialState);
   const { boardDataManager } = useContext(DataContext)!;
-  console.log("boardDatamanager", boardDataManager);
   // get all boards and board details initially
   const { startProcessing: fetchInitialData } = useData<
     { boards: Board[] | null; boardDetails: BoardDetails | null },
@@ -196,6 +215,23 @@ function BoardContextProvider({ children }: { children: ReactNode }) {
     // will edit both boards and board details
     dispatch({ type: "EDIT_BOARD", payload: { ...s } });
   });
+
+  // delete board , when a board is deleted we have to fetch newly selected board details
+  const { startProcessing: deleteBoardAndFetchBoardDetails } = useData<
+    {
+      deletedBoardId: string;
+      boardDetails: BoardDetails | null;
+    },
+    { deleteBoardId: string; fetchBoardDetailsId: string | null }
+  >(boardDataManager.deleteBoardAndFetchBoardDetails, (s) => {
+    dispatch({ type: "DELETE_BOARD", payload: { ...s } });
+  });
+
+  function deleteBoard(id: string) {
+    const fetchBoardDetailsId = state.boards.data ? state.boards.data[0].id : null;
+    deleteBoardAndFetchBoardDetails({ deleteBoardId: id, fetchBoardDetailsId });
+  }
+
   return (
     <BoardContext.Provider
       value={{
@@ -204,6 +240,7 @@ function BoardContextProvider({ children }: { children: ReactNode }) {
         task: state.task,
         addBoard,
         editBoard,
+        deleteBoard,
         updateSelectedBoardAndFetchBoardDetails,
       }}
     >

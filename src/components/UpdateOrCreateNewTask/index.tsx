@@ -51,7 +51,6 @@ const StyledCrossIonWrapper = styled.div`
 
 const UpdateOrCreateNewTask = ({ initialValues = null }: { initialValues?: null | Omit<Task, "order"> }) => {
   const isCreateMode = initialValues === null;
-  console.log(initialValues, "EditTask");
   const [title, setTitle] = useState(isCreateMode ? "" : initialValues.title);
   const [taskId, setTaskId] = useState(isCreateMode ? generateTemporaryId() : initialValues.id);
   const [description, setDescription] = useState<null | string>(isCreateMode ? null : initialValues.description);

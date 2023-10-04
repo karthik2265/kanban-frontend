@@ -7,9 +7,12 @@ export type Board = {
 export type BoardDetails = {
   id: string;
   title: string;
-  columns: (BoardColumn & {
-    tasks?: Task[] | null | undefined;
-  })[] | null;
+  columns:
+    | (BoardColumn & {
+        tasks?: Task[] | null | undefined;
+      })[]
+    | null;
+  order: number;
 };
 
 export type BoardColumn = {

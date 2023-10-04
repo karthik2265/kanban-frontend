@@ -50,6 +50,14 @@ class BoardLocalStorageStrategy implements IBoardStorageStrategy {
     return board;
   }
 
+  async deleteBoard(id: string) {
+    let boards: Board[] = JSON.parse(localStorage.getItem("boards")!);
+    boards = boards.filter((b) => b.id !== id);
+    localStorage.setItem("boards", JSON.stringify(boards));
+    localStorage.setItem("boardDetails", JSON.stringify(null));
+    return id;
+  }
+
   async getInitialData() {
     let boards: Board[] | null = null;
     let boardDetails: BoardDetails | null = null;

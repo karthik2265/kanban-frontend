@@ -29,7 +29,6 @@ const Menu = () => {
   useEffect(() => {
     // Set the user immediately if already signed in
     supabase.auth.getSession().then(({ data, error }) => {
-      console.log(data, error);
       if (data.session) {
         setUser(data.session.user);
       }
@@ -48,7 +47,7 @@ const Menu = () => {
     };
   }, []);
   const { isSecondaryMenuOpen, toggleSecondaryMenuVisibility } = useContext(RootLayoutContext)!;
-  const { boardDetails, editBoard } = useContext(BoardContext)!;
+  const { boardDetails, editBoard, deleteBoard } = useContext(BoardContext)!;
   // modals
   // const [isNewTaskModalOpen, setIsNewTaskModalOpen] = useState(false);
   const [isEditBoardModalOpen, setIsEditBoardModalOpen] = useState(false);
@@ -76,7 +75,6 @@ const Menu = () => {
             onClick={async (event) => {
               event.preventDefault();
               const { user, data, error } = await supabase.auth.signInWithOAuth({ provider: "github" });
-              console.log("error", error, data, user);
             }}
           >
             <LargeHeading> {user ? `Profile` : "Login with github"}</LargeHeading>
@@ -119,9 +117,20 @@ const Menu = () => {
           />
         )}
       </Modal>
-      {/* <Modal isOpen={isDeleteBoardModalOpen} setIsOpen={setIsDeleteBoardModalOpen}>
-        {boardDetails.data && <DeleteBoard />}
-      </Modal> */}
+      <Modal isOpen={isDeleteBoardModalOpen} setIsOpen={setIsDeleteBoardModalOpen}>
+        {boardDetails.data && (
+          <DeleteBoard
+            title={boardDetails.data.title}
+            id={boardDetails.data.id}
+            onSubmit={(id) => {
+              if (id) {
+                deleteBoard(id);
+              }
+              setIsDeleteBoardModalOpen(false);
+            }}
+          />
+        )}
+      </Modal>
     </StyledMenuWrapper>
   );
 };

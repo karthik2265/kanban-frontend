@@ -153,7 +153,6 @@ const Board = () => {
         {selectedTask && (
           <EditTask
             onSubmit={(data) => {
-              console.log(data);
               setIsEditTaskDetailsModalOpen(false);
             }}
             boardColumns={boardColumns!}
