@@ -1,31 +1,36 @@
 import { useState, useContext } from "react";
 import { BoardDetails, Subtask, Task } from "@/types";
-import { StyledBoardWrapper, StyledColumnTasksWrapper, StyledNewColumn, StyledTask } from "./StyledComponents";
-import MediumHeading from "../typography/MediumHeading";
-import MediumBoldBodyText from "../typography/MediumBoldBodyText";
-import withDraggable from "@/components/dnd/draggableHOC";
-import withDroppable from "@/components/dnd/droppableHOC";
 import { DragDropContext, DropResult } from "@hello-pangea/dnd";
 import _ from "lodash";
+import { BoardContext } from "@/context/BoardContext";
+// components
 import Modal from "@/components/Modal";
 import TaskDetails from "@/components/TaskDetails";
+import MediumBoldBodyText from "@/components/typography/MediumBoldBodyText";
 import EditTask from "@/components/UpdateOrCreateNewTask";
-import DeleteTask from "../DeleteTask";
-import { BoardContext } from "@/context/BoardContext";
+import DeleteTask from "@/components/DeleteTask";
+import LargeHeading from "@/components/typography/LargeHeading";
+import MediumHeading from "@/components/typography/MediumHeading";
+import ButtonPrimaryLarge from "@/components/buttons/ButtonPrimaryLarge";
+import withDraggable from "@/components/dnd/draggableHOC";
+import withDroppable from "@/components/dnd/droppableHOC";
+import { StyledBoardWrapper, StyledColumnTasksWrapper, StyledNewColumn, StyledTask } from "./StyledComponents";
+import EditBoard from "@/components/UpdateOrCreateNewBoard";
+import CreateNewBoard from "@/components/UpdateOrCreateNewBoard";
 
 const Board = () => {
-  const { boardDetails } = useContext(BoardContext)!;
-  const [boardColumns, setBoardColumns] = useState(() => {
-    if (boardDetails.data) {
-      return boardDetails.data.columns;
-    }
-    return null;
-  });
-
+  const { boardDetails, editBoard } = useContext(BoardContext)!;
+  const boardColumns = boardDetails.data?.columns;
+  const isColumnsEmpty = boardColumns === null || boardColumns === undefined || boardColumns.length === 0;
+  const noBoard = boardDetails.data === null;
   const [selectedTask, setSelectedTask] = useState<null | Task>(null);
+  // modals
   const [isTaskDetailsModalOpen, setIsTaskDetailsModalOpen] = useState(false);
   const [isEditTaskDetailsModalOpen, setIsEditTaskDetailsModalOpen] = useState(false);
   const [isDeleteTaskModalOpen, setIsDeleteTaskModalOpen] = useState(false);
+  const [isCreateNewBoardModalOpen, setIsCreateNewBoardModalOpen] = useState(false);
+  const [isEditBoardModalOpen, setIsEditBoardModalOpen] = useState(false);
+
 
   function dragEndEventHandler(result: DropResult) {
     // adjust order of tasks in columns based on where the task is dragged
@@ -44,7 +49,7 @@ const Board = () => {
         if (destinationColumnId === column.id) {
           destinationColumnIndex = columnIndex;
         }
-        column.tasks.forEach((item) => {
+        column.tasks?.forEach((item) => {
           if (item.id === taskId) {
             sourceColumnIndex = columnIndex;
             task = _.cloneDeep(item);
@@ -52,27 +57,27 @@ const Board = () => {
         });
       });
       if (sourceColumnIndex === destinationColumnIndex && taskIndex === tasknewIndex) return;
-      // update state
-      setBoardColumns((previous) => {
-        const columns = _.cloneDeep(previous);
-        // delete the task
-        columns!.forEach((column, columnIndex) => {
-          if (columnIndex === sourceColumnIndex) {
-            column.tasks = column.tasks.filter((task) => task.id !== taskId);
-          }
-        });
-        // add the task to new position
-        columns!.forEach((column) => {
-          if (column.id === destinationColumnId) {
-            column.tasks.splice(tasknewIndex, 0, task!);
-          }
-        });
-        return columns;
-      });
+      // update task in redux
+      // setBoardColumns((previous) => {
+      //   const columns = _.cloneDeep(previous);
+      //   // delete the task
+      //   columns!.forEach((column, columnIndex) => {
+      //     if (columnIndex === sourceColumnIndex) {
+      //       column.tasks = column.tasks?.filter((task) => task.id !== taskId);
+      //     }
+      //   });
+      //   // add the task to new position
+      //   columns!.forEach((column) => {
+      //     if (column.id === destinationColumnId) {
+      //       column.tasks?.splice(tasknewIndex, 0, task!);
+      //     }
+      //   });
+      //   return columns;
+      // });
     }
   }
   return (
-    <StyledBoardWrapper>
+    <StyledBoardWrapper $isColumnsAvailable={!isColumnsEmpty}>
       <DragDropContext onDragEnd={dragEndEventHandler}>
         {boardColumns &&
           boardColumns.map((column) => {
@@ -80,13 +85,13 @@ const Board = () => {
               return (
                 <div key={column.id}>
                   <div style={{ marginBottom: "1.25rem" }}>
-                    <MediumBoldBodyText
-                      isPrimary={false}
-                    >{`${column.title}  (${column.tasks.length})`}</MediumBoldBodyText>
+                    <MediumBoldBodyText isPrimary={false}>{`${column.title}  (${
+                      column.tasks?.length || 0
+                    })`}</MediumBoldBodyText>
                   </div>
 
                   <StyledColumnTasksWrapper>
-                    {column.tasks.map((task, taskIndex) => {
+                    {column.tasks?.map((task, taskIndex) => {
                       const Task = () => {
                         const totalSubTasks = task.subtasks?.length || 0;
                         const subTasksDone = task.subtasks && task.subtasks.filter((x) => x.isDone).length;
@@ -115,9 +120,51 @@ const Board = () => {
             const DroppableColumn = withDroppable(Column, column.id);
             return <DroppableColumn key={column.id} />;
           })}
+        {/* board with no columns */}
+        {isColumnsEmpty && !noBoard && (
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: "1.5rem",
+              alignItems: "center",
+              width: "28.6875rem",
+              textAlign: "center",
+            }}
+          >
+            <LargeHeading isPrimary={false}>This board is empty. Create a new column to get started.</LargeHeading>
+            <div style={{ width: "10.875rem" }}>
+              <ButtonPrimaryLarge onClick={() => setIsEditBoardModalOpen(true)}>+ Add New Column</ButtonPrimaryLarge>
+            </div>
+          </div>
+        )}
+        {/* no board */}
+        {noBoard && (
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: "1.5rem",
+              alignItems: "center",
+              width: "28.6875rem",
+              textAlign: "center",
+            }}
+          >
+            <LargeHeading isPrimary={false}>Looks Empty. Create a new board to get started.</LargeHeading>
+            <div style={{ width: "10.875rem" }}>
+              <ButtonPrimaryLarge
+                onClick={() => {
+                  setIsCreateNewBoardModalOpen(true);
+                }}
+              >
+                + Add New Board
+              </ButtonPrimaryLarge>
+            </div>
+          </div>
+        )}
       </DragDropContext>
 
-      <StyledNewColumn />
+      {!isColumnsEmpty && <StyledNewColumn onClick={() => setIsEditBoardModalOpen(true)} />}
       {/* modals */}
       <Modal isOpen={isTaskDetailsModalOpen} setIsOpen={setIsTaskDetailsModalOpen}>
         {selectedTask && (
@@ -167,6 +214,20 @@ const Board = () => {
             title={selectedTask.title}
             onSubmit={(id) => {
               setIsDeleteTaskModalOpen(false);
+            }}
+          />
+        )}
+      </Modal>
+      <Modal isOpen={isCreateNewBoardModalOpen} setIsOpen={setIsCreateNewBoardModalOpen}>
+        <CreateNewBoard onSubmit={() => setIsCreateNewBoardModalOpen(false)} />
+      </Modal>
+      <Modal isOpen={isEditBoardModalOpen} setIsOpen={setIsEditBoardModalOpen}>
+        {!noBoard && (
+          <EditBoard
+            initialValues={boardDetails.data}
+            onSubmit={(board) => {
+              editBoard(board);
+              setIsEditBoardModalOpen(false);
             }}
           />
         )}

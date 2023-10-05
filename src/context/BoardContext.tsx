@@ -128,6 +128,8 @@ function reducer(state: State, action: Action) {
           }
         });
         const boardDetails = updatedState.boardDetails.data;
+        boardDetails!.title = board.title;
+        boardDetails!.order = board.order;
         if (boardDetails?.columns) {
           boardDetails?.columns?.forEach((c, i) => {
             const updatedColumn = board.columns?.find((x) => x.id === c.id);
@@ -228,7 +230,7 @@ function BoardContextProvider({ children }: { children: ReactNode }) {
   });
 
   function deleteBoard(id: string) {
-    const fetchBoardDetailsId = state.boards.data ? state.boards.data[0].id : null;
+    const fetchBoardDetailsId = state.boards.data ? state.boards.data.find((b) => b.id != id)?.id || null : null;
     deleteBoardAndFetchBoardDetails({ deleteBoardId: id, fetchBoardDetailsId });
   }
 

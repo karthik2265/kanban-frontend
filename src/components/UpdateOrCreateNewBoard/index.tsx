@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Board, BoardColumn } from "@/types";
 import styled from "styled-components";
 import { generateTemporaryId } from "@/util";
@@ -68,6 +68,12 @@ const UpdateOrCreateNewBoard = ({ initialValues = null, onSubmit }: UpdateOrCrea
     if (isCreateMode || !initialValues.columns) return defaultColumns;
     return initialValues.columns;
   });
+  useEffect(() => {
+    if (initialValues) {
+      setTitle(initialValues.title);
+      setColumns(initialValues.columns || []);
+    }
+  }, [initialValues]);
   const [isFormSubmitted, setIsFormSubmitted] = useState(false);
   const { addBoard, boards } = useContext(BoardContext)!;
   return (

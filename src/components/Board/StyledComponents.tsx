@@ -1,9 +1,11 @@
 import { styled } from "styled-components";
 
-export const StyledBoardWrapper = styled.div`
+export const StyledBoardWrapper = styled.div<{ $isColumnsAvailable: boolean }>`
   overflow: scroll;
   height: 100%;
   display: flex;
+  justify-content: ${(props) => (props.$isColumnsAvailable ? "" : "center")};
+  align-items: ${(props) => (props.$isColumnsAvailable ? "" : "center")};
   gap: 1.5rem;
   padding: 1rem;
 `;

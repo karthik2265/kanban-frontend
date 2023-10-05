@@ -38,7 +38,6 @@ export class BoardDataManager {
     if (fetchBoardDetailsId) {
       boardDetails = await this.strategy.getBoardDetails(fetchBoardDetailsId);
     }
-    console.log(deleteBoardId, boardDetails);
     return { deletedBoardId, boardDetails };
   }
 

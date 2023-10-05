@@ -30,7 +30,6 @@ const ButtonPrimaryLarge = ({
 }: {
   children: ReactNode;
   onClick: () => void;
-  height: string;
 }) => {
   return (
     <StyledButtonPrimaryLarge onClick={onClick}>
