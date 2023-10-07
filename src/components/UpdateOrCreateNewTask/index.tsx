@@ -1,6 +1,6 @@
+import { useState, useContext } from "react";
 import { styled } from "styled-components";
-import { generateTemporaryId } from "@/util";
-import { useState } from "react";
+import { findMaxByKey, generateTemporaryId } from "@/util";
 // components
 import LargeHeading from "@/components/typography/LargeHeading";
 import MediumBoldBodyText from "@/components/typography/MediumBoldBodyText";
@@ -13,6 +13,7 @@ import ButtonPrimarySmall from "@/components/buttons/ButtonPrimarySmall";
 import Textarea from "@/components/inputs/Textarea";
 
 import _ from "lodash";
+import { BoardContext } from "@/context/BoardContext";
 
 const StyledWrapper = styled.div`
   width: 30rem;
@@ -49,22 +50,35 @@ const StyledCrossIonWrapper = styled.div`
   }
 `;
 
-const UpdateOrCreateNewTask = ({ initialValues = null }: { initialValues?: null | Omit<Task, "order"> }) => {
+const UpdateOrCreateNewTask = ({
+  initialValues = null,
+  onSubmit,
+}: {
+  initialValues?: null | Omit<Task, "order">;
+  onSubmit: (task: Task) => void;
+}) => {
   const isCreateMode = initialValues === null;
+  const { boardDetails, addTask } = useContext(BoardContext)!;
   const [title, setTitle] = useState(isCreateMode ? "" : initialValues.title);
-  const [taskId, setTaskId] = useState(isCreateMode ? generateTemporaryId() : initialValues.id);
+  const taskId = isCreateMode ? generateTemporaryId() : initialValues.id;
   const [description, setDescription] = useState<null | string>(isCreateMode ? null : initialValues.description);
   const [subtasks, setSubtasks] = useState(
     isCreateMode ? [{ id: generateTemporaryId(), value: "", order: 1, isDone: false, taskId }] : initialValues.subtasks
   );
-  const [status, setStatus] = useState(isCreateMode ? boardColumns[0].id : initialValues.columnId);
+  const [status, setStatus] = useState(
+    isCreateMode
+      ? (boardDetails.data?.columns?.length || 0) > 0
+        ? boardDetails!.data!.columns![0].id
+        : ""
+      : initialValues.columnId
+  );
   const [isFormSubmitted, setIsFormSubmitted] = useState(false);
 
   function resetFormToInitialState() {
     setTitle("");
     setDescription("");
     setSubtasks([{ id: generateTemporaryId(), value: "", order: 1, isDone: false, taskId }]);
-    setStatus(boardColumns[0].id);
+    setStatus(boardDetails.data!.columns![0].id);
     setIsFormSubmitted(false);
   }
   return (
@@ -157,23 +171,36 @@ const UpdateOrCreateNewTask = ({ initialValues = null }: { initialValues?: null 
               setStatus(id);
             }}
             value={status}
-            options={boardColumns.map((bc) => ({ id: bc.id, displayText: bc.title, isSelected: status === bc.id }))}
+            options={boardDetails.data!.columns!.map((bc) => ({
+              id: bc.id,
+              displayText: bc.title,
+              isSelected: status === bc.id,
+            }))}
           />
         </StyledInputWrapper>
         <div style={{ marginTop: "0.5rem" }}>
           <ButtonPrimarySmall
             onClick={() => {
               setIsFormSubmitted(true);
-              const data = { title, description, subtasks, status };
+              let order = 0;
+              boardDetails.data?.columns?.forEach((c) => {
+                if (c.id === status) {
+                  const maxOrder = findMaxByKey(c.tasks, (t) => t.order);
+                  order = maxOrder + 1;
+                }
+              });
+              const data = { title, description, subtasks, status, order };
               if (isFormDataValid(data)) {
-                onSubmit({
+                const newTask = {
                   id: generateTemporaryId(),
+                  order,
                   title: data.title,
                   description: data.title,
                   subtasks: data.subtasks,
                   columnId: data.status,
-                });
-                
+                };
+                onSubmit(newTask);
+                addTask(newTask);
                 if (isCreateMode) {
                   resetFormToInitialState();
                 }

@@ -21,6 +21,7 @@ import CreateNewBoard from "@/components/UpdateOrCreateNewBoard";
 const Board = () => {
   const { boardDetails, editBoard } = useContext(BoardContext)!;
   const boardColumns = boardDetails.data?.columns;
+  console.log('boardColumns = ', boardColumns);
   const isColumnsEmpty = boardColumns === null || boardColumns === undefined || boardColumns.length === 0;
   const noBoard = boardDetails.data === null;
   const [selectedTask, setSelectedTask] = useState<null | Task>(null);

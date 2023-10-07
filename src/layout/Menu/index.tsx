@@ -49,7 +49,7 @@ const Menu = () => {
   const { isSecondaryMenuOpen, toggleSecondaryMenuVisibility } = useContext(RootLayoutContext)!;
   const { boardDetails, editBoard, deleteBoard } = useContext(BoardContext)!;
   // modals
-  // const [isNewTaskModalOpen, setIsNewTaskModalOpen] = useState(false);
+  const [isNewTaskModalOpen, setIsNewTaskModalOpen] = useState(false);
   const [isEditBoardModalOpen, setIsEditBoardModalOpen] = useState(false);
   const [isDeleteBoardModalOpen, setIsDeleteBoardModalOpen] = useState(false);
   return (
@@ -80,10 +80,10 @@ const Menu = () => {
             <LargeHeading> {user ? `Profile` : "Login with github"}</LargeHeading>
           </div>
           <StyledAddNewTaskActionButton
-            $isAvailable={!!(boardDetails.data && boardDetails.data.columns)}
+            $isAvailable={!!(boardDetails.data?.columns && boardDetails.data.columns.length > 0)}
             onClick={() => {
-              if (boardDetails.data && boardDetails.data.columns) {
-                // setIsNewTaskModalOpen(true);
+              if (boardDetails.data?.columns && boardDetails.data.columns.length > 0) {
+                setIsNewTaskModalOpen(true);
               }
             }}
           >
@@ -103,9 +103,11 @@ const Menu = () => {
         </StyledActionsWrapper>
       </StyledMenuContentWrapper>
       {/* modals */}
-      {/* <Modal isOpen={isNewTaskModalOpen} setIsOpen={setIsNewTaskModalOpen}>
-        {boardDetails.data && boardDetails.data.columns && <NewTask />}
-      </Modal> */}
+      <Modal isOpen={isNewTaskModalOpen} setIsOpen={setIsNewTaskModalOpen}>
+        {boardDetails.data?.columns && boardDetails.data.columns.length > 0 && (
+          <NewTask onSubmit={() => setIsNewTaskModalOpen(false)} />
+        )}
+      </Modal>
       <Modal isOpen={isEditBoardModalOpen} setIsOpen={setIsEditBoardModalOpen}>
         {boardDetails.data && (
           <EditBoard

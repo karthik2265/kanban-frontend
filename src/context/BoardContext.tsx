@@ -3,15 +3,16 @@ import { Board, BoardColumn, BoardDetails, Task } from "@/types";
 import _ from "lodash";
 import useData from "@/hooks/useData";
 import { DataContext } from "./DataContext";
+import { sortByKey } from "@/util";
 
 const BoardContext = createContext<null | {
   boards: State["boards"];
   boardDetails: State["boardDetails"];
-  task: State["task"];
   addBoard: (board: Omit<Board, "order"> & { columns: BoardColumn[] | null }) => void;
   editBoard: (board: Board & { columns: BoardColumn[] | null }) => void;
   deleteBoard: (id: string) => void;
   updateSelectedBoardAndFetchBoardDetails: (id: string) => void;
+  addTask: (task: Task) => void;
 }>(null);
 
 type Action =
@@ -52,7 +53,7 @@ type Action =
       };
     }
   | {
-      type: "UPDATE_TASK";
+      type: "ADD_TASK";
       payload: {
         data: Task | null;
         isProcessing: boolean;
@@ -71,11 +72,6 @@ type State = {
     isProcessing: boolean;
     error: null | string;
   };
-  task: {
-    data: Task | null;
-    isProcessing: boolean;
-    error: null | string;
-  };
 };
 
 const initialState: State = {
@@ -85,11 +81,6 @@ const initialState: State = {
     error: null,
   },
   boardDetails: {
-    data: null,
-    isProcessing: false,
-    error: null,
-  },
-  task: {
     data: null,
     isProcessing: false,
     error: null,
@@ -112,7 +103,13 @@ function reducer(state: State, action: Action) {
       if (action.payload.data) {
         const newBoard = action.payload.data;
         updatedState.boards.data.push(newBoard);
-        updatedState.boardDetails.data = { id: newBoard.id, title: newBoard.title, columns: newBoard.columns as null };
+        sortByKey<Board>(updatedState.boards.data, (b) => b.order);
+        updatedState.boardDetails.data = {
+          id: newBoard.id,
+          title: newBoard.title,
+          columns: newBoard.columns as null,
+          order: newBoard.order,
+        };
       }
       updatedState.boards.isProcessing = action.payload.isProcessing;
       updatedState.boards.error = action.payload.error;
@@ -162,9 +159,23 @@ function reducer(state: State, action: Action) {
       updatedState.boardDetails.error = action.payload.error;
       updatedState.boardDetails.isProcessing = action.payload.isProcessing;
       break;
-    case "UPDATE_TASK":
-      updatedState.task = { ...action.payload };
-      break;
+    case "ADD_TASK":
+      if (action.payload.data) {
+        const task = action.payload.data;
+        updatedState.boardDetails.data?.columns?.forEach((c) => {
+          if (c.id === task.columnId) {
+            if (c.tasks) {
+              c.tasks?.push(task);
+              sortByKey<Task>(c.tasks!, (t) => t.order);
+            } else {
+              c.tasks = [task];
+            }
+          }
+        });
+      }
+      updatedState.boardDetails.isProcessing = action.payload.isProcessing;
+      updatedState.boardDetails.error = action.payload.error;
+      return updatedState;
   }
   return updatedState;
 }
@@ -194,7 +205,7 @@ function BoardContextProvider({ children }: { children: ReactNode }) {
     Board & { columns: BoardColumn[] | null },
     Omit<Board & { columns: BoardColumn[] | null }, "order">
   >(boardDataManager.addBoard, (s) => {
-    dispatch({ type: "ADD_BOARD", payload: { ...s } });
+    dispatch({ type: "ADD_BOARD", payload: s });
   });
 
   // update selected board meaning have to fetch board details also
@@ -215,7 +226,7 @@ function BoardContextProvider({ children }: { children: ReactNode }) {
     Board & { columns: BoardColumn[] | null }
   >(boardDataManager.editBoard, (s) => {
     // will edit both boards and board details
-    dispatch({ type: "EDIT_BOARD", payload: { ...s } });
+    dispatch({ type: "EDIT_BOARD", payload: s });
   });
 
   // delete board , when a board is deleted we have to fetch newly selected board details
@@ -226,7 +237,7 @@ function BoardContextProvider({ children }: { children: ReactNode }) {
     },
     { deleteBoardId: string; fetchBoardDetailsId: string | null }
   >(boardDataManager.deleteBoardAndFetchBoardDetails, (s) => {
-    dispatch({ type: "DELETE_BOARD", payload: { ...s } });
+    dispatch({ type: "DELETE_BOARD", payload: s });
   });
 
   function deleteBoard(id: string) {
@@ -234,16 +245,21 @@ function BoardContextProvider({ children }: { children: ReactNode }) {
     deleteBoardAndFetchBoardDetails({ deleteBoardId: id, fetchBoardDetailsId });
   }
 
+  // add task
+  const { startProcessing: addTask } = useData<Task, Task>(boardDataManager.addTask, (s) => {
+    dispatch({ type: "ADD_TASK", payload: s });
+  });
+
   return (
     <BoardContext.Provider
       value={{
         boards: state.boards,
         boardDetails: state.boardDetails,
-        task: state.task,
         addBoard,
         editBoard,
         deleteBoard,
         updateSelectedBoardAndFetchBoardDetails,
+        addTask,
       }}
     >
       {children}

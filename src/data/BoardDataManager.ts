@@ -1,4 +1,4 @@
-import { Board, BoardColumn, BoardDetails } from "@/types";
+import { Board, BoardColumn, BoardDetails, Task } from "@/types";
 import IBoardStorageStrategy from "./stratagies/IBoardStorageStrategy";
 
 export class BoardDataManager {
@@ -9,9 +9,9 @@ export class BoardDataManager {
     this.addBoard = this.addBoard.bind(this);
     this.editBoard = this.editBoard.bind(this);
     this.deleteBoardAndFetchBoardDetails = this.deleteBoardAndFetchBoardDetails.bind(this);
-    this.updateBoard = this.updateBoard.bind(this);
     this.getInitialData = this.getInitialData.bind(this);
     this.getBoardDetails = this.getBoardDetails.bind(this);
+    this.addTask = this.addTask.bind(this);
   }
 
   setStrategy(newStrategy: IBoardStorageStrategy) {
@@ -41,16 +41,16 @@ export class BoardDataManager {
     return { deletedBoardId, boardDetails };
   }
 
-  updateBoard(data: BoardDetails) {
-    return this.strategy.updateBoard(data);
-  }
-
   getInitialData() {
     return this.strategy.getInitialData();
   }
 
   getBoardDetails(id: string) {
     return this.strategy.getBoardDetails(id);
+  }
+
+  addTask(task: Task) {
+    return this.strategy.addTask(task);
   }
 }
 

@@ -1,16 +1,26 @@
-import { Board, BoardColumn, BoardDetails } from "@/types";
+import { Board, BoardColumn, BoardDetails, Task } from "@/types";
 import IBoardStorageStrategy from "./IBoardStorageStrategy";
 
 class BoardLocalStorageStrategy implements IBoardStorageStrategy {
-  boardsCount: number = 0;
+  async getInitialData() {
+    let boards: Board[] | null = null;
+    let boardDetails: BoardDetails | null = null;
+    boards = JSON.parse(localStorage.getItem("boards") || "") || null;
+    boardDetails = JSON.parse(localStorage.getItem("boardDetails") || "") || null;
+    return { boards, boardDetails };
+  }
 
   async addBoard(board: Board & { columns: BoardColumn[] | null }) {
     if (!localStorage.getItem("boards")) {
       localStorage.setItem("boards", "[]");
     }
     const boards: Board[] = JSON.parse(localStorage.getItem("boards")!);
-    this.boardsCount++;
-    const newBoard = { ...board, order: this.boardsCount, isSelected: true };
+    const order =
+      (boards.reduce((x, y) => {
+        if (x.order > y.order) return x;
+        return y;
+      })?.order || 0) + 1;
+    const newBoard = { ...board, order, isSelected: true };
     boards.push(newBoard);
     localStorage.setItem("boards", JSON.stringify(boards));
     localStorage.setItem("boardDetails", JSON.stringify(board));
@@ -58,17 +68,6 @@ class BoardLocalStorageStrategy implements IBoardStorageStrategy {
     return id;
   }
 
-  async getInitialData() {
-    let boards: Board[] | null = null;
-    let boardDetails: BoardDetails | null = null;
-    boards = JSON.parse(localStorage.getItem("boards") || "") || null;
-    boardDetails = JSON.parse(localStorage.getItem("boardDetails") || "") || null;
-    if (boards) {
-      this.boardsCount = boards.length;
-    }
-    return { boards, boardDetails };
-  }
-
   async getBoardDetails(id: string): Promise<BoardDetails> {
     // in local storage we just store the entire data of a board in boards array
     let boards: BoardDetails[] | null = null;
@@ -81,9 +80,28 @@ class BoardLocalStorageStrategy implements IBoardStorageStrategy {
     return boardDetails!;
   }
 
-  async updateBoard(boardToBeUpdated: BoardDetails) {
-    localStorage.setItem("boardDetails", JSON.stringify(boardToBeUpdated));
-    return boardToBeUpdated;
+  async addTask(task: Task): Promise<Task> {
+    // find the board this task belongs to
+    let boards: BoardDetails[] | null = null;
+    let boardDetails: BoardDetails;
+    const columnId = task.columnId;
+    boards = JSON.parse(localStorage.getItem("boards") || "") || [];
+    console.log('boards in ls = ', boards);
+    boards?.forEach((board) => {
+      board.columns?.forEach((c) => {
+        if (c.id === columnId) {
+          if (c.tasks) {
+            c.tasks?.push(task);
+            boardDetails = board;
+          } else {
+            c.tasks = [task];
+          }
+        }
+      });
+    });
+    localStorage.setItem("boards", JSON.stringify(boards));
+    localStorage.setItem("boardDetails", JSON.stringify(boardDetails!));
+    return task;
   }
 }
 
