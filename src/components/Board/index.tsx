@@ -3,6 +3,8 @@ import { Task } from "@/types";
 import { DragDropContext, DropResult } from "@hello-pangea/dnd";
 import _ from "lodash";
 import { BoardContext } from "@/context/BoardContext";
+import { rearrangeOrderAccordingToIndex, sortByKey } from "@/util";
+
 // components
 import Modal from "@/components/Modal";
 import TaskDetails from "@/components/TaskDetails";
@@ -17,8 +19,6 @@ import withDroppable from "@/components/dnd/droppableHOC";
 import { StyledBoardWrapper, StyledColumnTasksWrapper, StyledNewColumn, StyledTask } from "./StyledComponents";
 import EditBoard from "@/components/UpdateOrCreateNewBoard";
 import CreateNewBoard from "@/components/UpdateOrCreateNewBoard";
-
-import { rearrangeOrderAccordingToIndex, sortByKey } from "@/util";
 
 const Board = () => {
   const { boardDetails, editBoard, deleteTask, editTask } = useContext(BoardContext)!;
@@ -39,7 +39,6 @@ const Board = () => {
     if (destination) {
       const taskId = result.draggableId;
       let task: Task;
-      // update
       const sourceColumnId = source.droppableId;
       const destinationColumnId = destination.droppableId;
       const taskIndexInSourceColumn = source.index;
@@ -152,7 +151,7 @@ const Board = () => {
           </div>
         )}
       </DragDropContext>
-
+      {/* board with columns */}
       {!isColumnsEmpty && <StyledNewColumn onClick={() => setIsEditBoardModalOpen(true)} />}
       {/* modals */}
       <Modal isOpen={isTaskDetailsModalOpen} setIsOpen={setIsTaskDetailsModalOpen}>

@@ -1,4 +1,4 @@
-import { ReactNode, createContext, useContext, useEffect, useReducer } from "react";
+import { ReactNode, createContext, useCallback, useContext, useEffect, useMemo, useReducer } from "react";
 import { Board, BoardColumn, BoardDetails, Task } from "@/types";
 import _ from "lodash";
 import useData from "@/hooks/useData";
@@ -237,102 +237,156 @@ function reducer(state: State, action: Action) {
 }
 
 // manage all the state here
-// 1) fetching all boards and select board details, lodaing and error states
-// 2) update selected board and fetching the newly selected board details, lodaing and error states
-// 3) creating or updating tasks in a board, loading and error states
 function BoardContextProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(reducer, initialState);
   const { boardDataManager } = useContext(DataContext)!;
   // get all boards and board details initially
+  const getInitialDataStateDispatcher = useCallback(
+    (s: {
+      data: { boards: Board[] | null; boardDetails: BoardDetails | null } | null;
+      error: null | string;
+      isProcessing: boolean;
+    }) => {
+      dispatch({ type: "UPDATE_BOARDS", payload: { ...s, data: s.data?.boards as null } });
+      dispatch({ type: "UPDATE_BOARD_DETAILS", payload: { ...s, data: s.data?.boardDetails as null } });
+    },
+    [dispatch]
+  );
   const { startProcessing: fetchInitialData } = useData<
     { boards: Board[] | null; boardDetails: BoardDetails | null },
     void
-  >(boardDataManager.getInitialData, (s) => {
-    dispatch({ type: "UPDATE_BOARDS", payload: { ...s, data: s.data?.boards as null } });
-    dispatch({ type: "UPDATE_BOARD_DETAILS", payload: { ...s, data: s.data?.boardDetails as null } });
-  });
+  >(boardDataManager.getInitialData, getInitialDataStateDispatcher);
 
   useEffect(() => {
     fetchInitialData();
-  }, []);
+  }, [fetchInitialData]);
 
   // add board
+  const addBoardStateDispatcher = useCallback(
+    (s: { data: (Board & { columns: BoardColumn[] | null }) | null; error: null | string; isProcessing: boolean }) => {
+      dispatch({ type: "ADD_BOARD", payload: s });
+    },
+    [dispatch]
+  );
   const { startProcessing: addBoard } = useData<
     Board & { columns: BoardColumn[] | null },
     Omit<Board & { columns: BoardColumn[] | null }, "order">
-  >(boardDataManager.addBoard, (s) => {
-    dispatch({ type: "ADD_BOARD", payload: s });
-  });
+  >(boardDataManager.addBoard, addBoardStateDispatcher);
 
   // update selected board meaning have to fetch board details also
+  const fetchBoardDetailsStateDispatcher = useCallback(
+    (s: { data: BoardDetails | null; error: null | string; isProcessing: boolean }) => {
+      dispatch({ type: "UPDATE_BOARD_DETAILS", payload: { ...s } });
+    },
+    [dispatch]
+  );
   const { startProcessing: fetchBoardDetails } = useData<BoardDetails, string>(
     boardDataManager.getBoardDetails,
-    (s) => {
-      dispatch({ type: "UPDATE_BOARD_DETAILS", payload: { ...s } });
-    }
+    fetchBoardDetailsStateDispatcher
   );
 
-  function updateSelectedBoardAndFetchBoardDetails(id: string) {
-    fetchBoardDetails(id);
-  }
+  const updateSelectedBoardAndFetchBoardDetails = useCallback(
+    (id: string) => {
+      fetchBoardDetails(id);
+    },
+    [fetchBoardDetails]
+  );
 
   // edit board
+  // will edit both boards and board details
+  const editBoardStateDispatcher = useCallback(
+    (s: { data: (Board & { columns: BoardColumn[] | null }) | null; error: null | string; isProcessing: boolean }) => {
+      dispatch({ type: "EDIT_BOARD", payload: s });
+    },
+    [dispatch]
+  );
   const { startProcessing: editBoard } = useData<
     Board & { columns: BoardColumn[] | null },
     Board & { columns: BoardColumn[] | null }
-  >(boardDataManager.editBoard, (s) => {
-    // will edit both boards and board details
-    dispatch({ type: "EDIT_BOARD", payload: s });
-  });
+  >(boardDataManager.editBoard, editBoardStateDispatcher);
 
   // delete board , when a board is deleted we have to fetch newly selected board details
+  const deleteBoardStateDispatcher = useCallback(
+    (s: {
+      data: { deletedBoardId: string; boardDetails: BoardDetails | null } | null;
+      isProcessing: boolean;
+      error: string | null;
+    }) => {
+      dispatch({ type: "DELETE_BOARD", payload: s });
+    },
+    [dispatch]
+  );
   const { startProcessing: deleteBoardAndFetchBoardDetails } = useData<
     {
       deletedBoardId: string;
       boardDetails: BoardDetails | null;
     },
     { deleteBoardId: string; fetchBoardDetailsId: string | null }
-  >(boardDataManager.deleteBoardAndFetchBoardDetails, (s) => {
-    dispatch({ type: "DELETE_BOARD", payload: s });
-  });
+  >(boardDataManager.deleteBoardAndFetchBoardDetails, deleteBoardStateDispatcher);
 
-  function deleteBoard(id: string) {
-    const fetchBoardDetailsId = state.boards.data ? state.boards.data.find((b) => b.id != id)?.id || null : null;
-    deleteBoardAndFetchBoardDetails({ deleteBoardId: id, fetchBoardDetailsId });
-  }
+  const deleteBoard = useCallback(
+    (id: string) => {
+      const fetchBoardDetailsId = state.boards.data ? state.boards.data.find((b) => b.id != id)?.id || null : null;
+      deleteBoardAndFetchBoardDetails({ deleteBoardId: id, fetchBoardDetailsId });
+    },
+    [deleteBoardAndFetchBoardDetails, state.boards.data]
+  );
 
   // add task
-  const { startProcessing: addTask } = useData<Task, Task>(boardDataManager.addTask, (s) => {
-    dispatch({ type: "ADD_TASK", payload: s });
-  });
+  const addTaskStateDispatcher = useCallback(
+    (s: { data: Task | null; isProcessing: boolean; error: string | null }) => {
+      dispatch({ type: "ADD_TASK", payload: s });
+    },
+    [dispatch]
+  );
+  const { startProcessing: addTask } = useData<Task, Task>(boardDataManager.addTask, addTaskStateDispatcher);
 
   // edit task
-  const { startProcessing: editTask } = useData<Task, Task>(boardDataManager.editTask, (s) => {
-    dispatch({ type: "EDIT_TASK", payload: s });
-  });
+  const editTaskStateDispatcher = useCallback(
+    (s: { data: Task | null; isProcessing: boolean; error: string | null }) => {
+      dispatch({ type: "EDIT_TASK", payload: s });
+    },
+    [dispatch]
+  );
+  const { startProcessing: editTask } = useData<Task, Task>(boardDataManager.editTask, editTaskStateDispatcher);
 
   // delete task
-  const { startProcessing: deleteTask } = useData<string, string>(boardDataManager.deleteTask, (s) => {
-    dispatch({ type: "DELETE_TASK", payload: s });
-  });
-
-  return (
-    <BoardContext.Provider
-      value={{
-        boards: state.boards,
-        boardDetails: state.boardDetails,
-        addBoard,
-        editBoard,
-        deleteBoard,
-        updateSelectedBoardAndFetchBoardDetails,
-        addTask,
-        editTask,
-        deleteTask,
-      }}
-    >
-      {children}
-    </BoardContext.Provider>
+  const deleteTaskStateDispatcher = useCallback(
+    (s: { data: string | null; isProcessing: boolean; error: string | null }) => {
+      dispatch({ type: "DELETE_TASK", payload: s });
+    },
+    [dispatch]
   );
+  const { startProcessing: deleteTask } = useData<string, string>(
+    boardDataManager.deleteTask,
+    deleteTaskStateDispatcher
+  );
+
+  const providerValue = useMemo(() => {
+    return {
+      boards: state.boards,
+      boardDetails: state.boardDetails,
+      addBoard,
+      editBoard,
+      deleteBoard,
+      updateSelectedBoardAndFetchBoardDetails,
+      addTask,
+      editTask,
+      deleteTask,
+    };
+  }, [
+    addBoard,
+    addTask,
+    deleteBoard,
+    deleteTask,
+    editBoard,
+    editTask,
+    state.boardDetails,
+    state.boards,
+    updateSelectedBoardAndFetchBoardDetails,
+  ]);
+
+  return <BoardContext.Provider value={providerValue}>{children}</BoardContext.Provider>;
 }
 
 export { BoardContext, BoardContextProvider };
