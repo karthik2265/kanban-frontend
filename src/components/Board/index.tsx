@@ -1,5 +1,5 @@
-import { useState, useContext, useEffect } from "react";
-import { BoardDetails, Subtask, Task } from "@/types";
+import { useState, useContext } from "react";
+import { Task } from "@/types";
 import { DragDropContext, DropResult } from "@hello-pangea/dnd";
 import _ from "lodash";
 import { BoardContext } from "@/context/BoardContext";
@@ -18,8 +18,10 @@ import { StyledBoardWrapper, StyledColumnTasksWrapper, StyledNewColumn, StyledTa
 import EditBoard from "@/components/UpdateOrCreateNewBoard";
 import CreateNewBoard from "@/components/UpdateOrCreateNewBoard";
 
+import { rearrangeOrderAccordingToIndex } from "@/util";
+
 const Board = () => {
-  const { boardDetails, editBoard, deleteTask } = useContext(BoardContext)!;
+  const { boardDetails, editBoard, deleteTask, editTask } = useContext(BoardContext)!;
   const boardColumns = boardDetails.data?.columns;
   const isColumnsEmpty = boardColumns === null || boardColumns === undefined || boardColumns.length === 0;
   const noBoard = !boardDetails.data;
@@ -36,43 +38,29 @@ const Board = () => {
     const { source, destination } = result;
     if (destination) {
       const taskId = result.draggableId;
-      const taskIndex = source.index;
-      let task = null;
-      let sourceColumnIndex = -1;
+      let task: Task;
       // update
+      const sourceColumnId = source.droppableId;
       const destinationColumnId = destination.droppableId;
-      let destinationColumnIndex = -1;
-      const tasknewIndex = destination.index;
+      const taskIndexInSourceColumn = source.index;
+      const taskIndexInDestinationColumn = destination.index;
+      if (sourceColumnId === destinationColumnId && taskIndexInSourceColumn === taskIndexInDestinationColumn) return;
+      let tasksInDestinationColumn: Task[] = [];
       // find the task
-      boardColumns!.forEach((column, columnIndex) => {
-        if (destinationColumnId === column.id) {
-          destinationColumnIndex = columnIndex;
+      boardColumns!.forEach((column) => {
+        if (column.id === destinationColumnId) {
+          tasksInDestinationColumn = column.tasks || [];
         }
-        column.tasks?.forEach((item) => {
-          if (item.id === taskId) {
-            sourceColumnIndex = columnIndex;
-            task = _.cloneDeep(item);
+        column.tasks?.forEach((t) => {
+          if (t.id === taskId) {
+            task = t;
+            task.columnId = destinationColumnId;
           }
         });
       });
-      if (sourceColumnIndex === destinationColumnIndex && taskIndex === tasknewIndex) return;
-      // update task in redux
-      // setBoardColumns((previous) => {
-      //   const columns = _.cloneDeep(previous);
-      //   // delete the task
-      //   columns!.forEach((column, columnIndex) => {
-      //     if (columnIndex === sourceColumnIndex) {
-      //       column.tasks = column.tasks?.filter((task) => task.id !== taskId);
-      //     }
-      //   });
-      //   // add the task to new position
-      //   columns!.forEach((column) => {
-      //     if (column.id === destinationColumnId) {
-      //       column.tasks?.splice(tasknewIndex, 0, task!);
-      //     }
-      //   });
-      //   return columns;
-      // });
+      tasksInDestinationColumn.splice(taskIndexInDestinationColumn, 0, task!);
+      rearrangeOrderAccordingToIndex(tasksInDestinationColumn);
+      editTask(task!);
     }
   }
   return (

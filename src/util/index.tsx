@@ -28,7 +28,7 @@ function sortByKey<T>(arr: T[], keyExtractor: (item: T) => number) {
 }
 
 function findMaxByKey<T>(arr: T[] | null | undefined, keyExtractor: (item: T) => number) {
-  if (!arr || arr.length === 0) { 
+  if (!arr || arr.length === 0) {
     return 0;
   }
 
@@ -48,4 +48,10 @@ function findMaxByKey<T>(arr: T[] | null | undefined, keyExtractor: (item: T) =>
   return keyExtractor(maxItem);
 }
 
-export { truncateText, generateTemporaryId, sortByKey, findMaxByKey };
+function rearrangeOrderAccordingToIndex<T extends { order: number }>(items: T[]) {
+  items.forEach((item, idx) => {
+    item.order = idx + 1;
+  });
+}
+
+export { truncateText, generateTemporaryId, sortByKey, findMaxByKey, rearrangeOrderAccordingToIndex };

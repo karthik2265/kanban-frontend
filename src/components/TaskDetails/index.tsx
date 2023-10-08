@@ -1,7 +1,7 @@
 import { useState, useContext, useEffect } from "react";
 import { styled } from "styled-components";
 import LargeHeading from "@/components/typography/LargeHeading";
-import { BoardColumn, Subtask, Task } from "@/types";
+import { Task } from "@/types";
 import MediumBoldBodyText from "../typography/MediumBoldBodyText";
 import ReadonlySubTask from "../inputs/ReadonlySubTask";
 import Dropdown from "@/components/inputs/Dropdown";

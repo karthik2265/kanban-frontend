@@ -7,7 +7,7 @@ import MediumBoldBodyText from "@/components/typography/MediumBoldBodyText";
 import TextField from "@/components/inputs/TextField";
 import CrossIcon from "@/components/icons/Cross";
 import ButtonSecondary from "../buttons/ButtonSecondary";
-import { BoardColumn, Subtask, Task } from "@/types";
+import { Subtask, Task } from "@/types";
 import Dropdown from "@/components/inputs/Dropdown";
 import ButtonPrimarySmall from "@/components/buttons/ButtonPrimarySmall";
 import Textarea from "@/components/inputs/Textarea";
