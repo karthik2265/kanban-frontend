@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { styled } from "styled-components";
 import DownArrowIcon from "./DownArrowIcon";
 
@@ -65,6 +65,11 @@ type DropdownProps = {
 const Dropdown = ({ options, placeholder = "Please select an option", value, onOptionSelect }: DropdownProps) => {
   const [active, setIsActive] = useState(false);
   const [selectedOption, setSelectedOption] = useState(value);
+  useEffect(() => {
+    if (value) {
+      setSelectedOption(value);
+    }
+  }, [value]);
   return (
     <StyledSelect $isActive={active} onClick={() => setIsActive((prev) => !prev)}>
       {selectedOption ? options.find((x) => x.id === selectedOption)?.displayText : placeholder}

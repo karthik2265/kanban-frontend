@@ -11,6 +11,8 @@ interface IBoardStorageStrategy {
   deleteBoard(id: string): Promise<string>;
   getBoardDetails(id: string): Promise<BoardDetails>;
   addTask(task: Task): Promise<Task>;
+  editTask(task: Task): Promise<Task>;
+  deleteTask(taskId: string): Promise<string>;
 }
 
 export default IBoardStorageStrategy;

@@ -1,4 +1,4 @@
-import { ReactNode, createContext, useCallback, useContext, useEffect, useReducer } from "react";
+import { ReactNode, createContext, useContext, useEffect, useReducer } from "react";
 import { Board, BoardColumn, BoardDetails, Task } from "@/types";
 import _ from "lodash";
 import useData from "@/hooks/useData";
@@ -13,6 +13,8 @@ const BoardContext = createContext<null | {
   deleteBoard: (id: string) => void;
   updateSelectedBoardAndFetchBoardDetails: (id: string) => void;
   addTask: (task: Task) => void;
+  editTask: (task: Task) => void;
+  deleteTask: (taskId: string) => void;
 }>(null);
 
 type Action =
@@ -56,6 +58,22 @@ type Action =
       type: "ADD_TASK";
       payload: {
         data: Task | null;
+        isProcessing: boolean;
+        error: null | string;
+      };
+    }
+  | {
+      type: "EDIT_TASK";
+      payload: {
+        data: Task | null;
+        isProcessing: boolean;
+        error: null | string;
+      };
+    }
+  | {
+      type: "DELETE_TASK";
+      payload: {
+        data: string | null;
         isProcessing: boolean;
         error: null | string;
       };
@@ -175,7 +193,45 @@ function reducer(state: State, action: Action) {
       }
       updatedState.boardDetails.isProcessing = action.payload.isProcessing;
       updatedState.boardDetails.error = action.payload.error;
-      return updatedState;
+      break;
+    case "EDIT_TASK":
+      // handle column change, title change, description change, subtasks changes
+      if (action.payload.data) {
+        const updatedTask = action.payload.data;
+        updatedState.boardDetails.data?.columns?.forEach((c) => {
+          c.tasks?.forEach((t, i) => {
+            if (t.id === updatedTask.id) {
+              c.tasks?.splice(i, 1);
+            }
+          });
+        });
+        updatedState.boardDetails.data?.columns?.forEach((c) => {
+          if (c.id === updatedTask.columnId) {
+            if (c.tasks) {
+              c.tasks.push(updatedTask);
+            } else {
+              c.tasks = [updatedTask];
+            }
+          }
+        });
+      }
+      updatedState.boardDetails.isProcessing = action.payload.isProcessing;
+      updatedState.boardDetails.error = action.payload.error;
+      break;
+    case "DELETE_TASK":
+      if (action.payload.data) {
+        const deletedTaskId = action.payload.data;
+        updatedState.boardDetails.data?.columns?.forEach((c) => {
+          c.tasks?.forEach((t, i) => {
+            if (t.id === deletedTaskId) {
+              c.tasks?.splice(i, 1);
+            }
+          });
+        });
+      }
+      updatedState.boardDetails.isProcessing = action.payload.isProcessing;
+      updatedState.boardDetails.error = action.payload.error;
+      break;
   }
   return updatedState;
 }
@@ -250,6 +306,16 @@ function BoardContextProvider({ children }: { children: ReactNode }) {
     dispatch({ type: "ADD_TASK", payload: s });
   });
 
+  // edit task
+  const { startProcessing: editTask } = useData<Task, Task>(boardDataManager.editTask, (s) => {
+    dispatch({ type: "EDIT_TASK", payload: s });
+  });
+
+  // delete task
+  const { startProcessing: deleteTask } = useData<string, string>(boardDataManager.deleteTask, (s) => {
+    dispatch({ type: "DELETE_TASK", payload: s });
+  });
+
   return (
     <BoardContext.Provider
       value={{
@@ -260,6 +326,8 @@ function BoardContextProvider({ children }: { children: ReactNode }) {
         deleteBoard,
         updateSelectedBoardAndFetchBoardDetails,
         addTask,
+        editTask,
+        deleteTask,
       }}
     >
       {children}

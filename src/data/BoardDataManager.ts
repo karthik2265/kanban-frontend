@@ -12,6 +12,8 @@ export class BoardDataManager {
     this.getInitialData = this.getInitialData.bind(this);
     this.getBoardDetails = this.getBoardDetails.bind(this);
     this.addTask = this.addTask.bind(this);
+    this.editTask = this.editTask.bind(this);
+    this.deleteTask = this.deleteTask.bind(this);
   }
 
   setStrategy(newStrategy: IBoardStorageStrategy) {
@@ -51,6 +53,14 @@ export class BoardDataManager {
 
   addTask(task: Task) {
     return this.strategy.addTask(task);
+  }
+
+  editTask(task: Task) {
+    return this.strategy.editTask(task);
+  }
+
+  deleteTask(taskId: string) {
+    return this.strategy.deleteTask(taskId);
   }
 }
 

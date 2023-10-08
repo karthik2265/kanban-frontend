@@ -17,12 +17,12 @@ const CheckBoxIcon = ({ isChecked }: { isChecked: boolean }) => {
         (isLightTheme ? (
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
             <rect width="16" height="16" rx="2" fill="white" />
-            <rect x="0.5" y="0.5" width="15" height="15" rx="1.5" stroke="#828FA3" stroke-opacity="0.248914" />
+            <rect x="0.5" y="0.5" width="15" height="15" rx="1.5" stroke="#828FA3" strokeOpacity="0.248914" />
           </svg>
         ) : (
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
             <rect width="16" height="16" rx="2" fill="#2B2C37" />
-            <rect x="0.5" y="0.5" width="15" height="15" rx="1.5" stroke="#828FA3" stroke-opacity="0.248914" />
+            <rect x="0.5" y="0.5" width="15" height="15" rx="1.5" stroke="#828FA3" strokeOpacity="0.248914" />
           </svg>
         ))}
     </>

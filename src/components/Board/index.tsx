@@ -1,4 +1,4 @@
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
 import { BoardDetails, Subtask, Task } from "@/types";
 import { DragDropContext, DropResult } from "@hello-pangea/dnd";
 import _ from "lodash";
@@ -19,11 +19,10 @@ import EditBoard from "@/components/UpdateOrCreateNewBoard";
 import CreateNewBoard from "@/components/UpdateOrCreateNewBoard";
 
 const Board = () => {
-  const { boardDetails, editBoard } = useContext(BoardContext)!;
+  const { boardDetails, editBoard, deleteTask } = useContext(BoardContext)!;
   const boardColumns = boardDetails.data?.columns;
-  console.log('boardColumns = ', boardColumns);
   const isColumnsEmpty = boardColumns === null || boardColumns === undefined || boardColumns.length === 0;
-  const noBoard = boardDetails.data === null;
+  const noBoard = !boardDetails.data;
   const [selectedTask, setSelectedTask] = useState<null | Task>(null);
   // modals
   const [isTaskDetailsModalOpen, setIsTaskDetailsModalOpen] = useState(false);
@@ -31,7 +30,6 @@ const Board = () => {
   const [isDeleteTaskModalOpen, setIsDeleteTaskModalOpen] = useState(false);
   const [isCreateNewBoardModalOpen, setIsCreateNewBoardModalOpen] = useState(false);
   const [isEditBoardModalOpen, setIsEditBoardModalOpen] = useState(false);
-
 
   function dragEndEventHandler(result: DropResult) {
     // adjust order of tasks in columns based on where the task is dragged
@@ -99,7 +97,7 @@ const Board = () => {
                         return (
                           <StyledTask
                             onClick={() => {
-                              setSelectedTask(task);
+                              setSelectedTask(_.cloneDeep(task));
                               setIsTaskDetailsModalOpen(true);
                             }}
                           >
@@ -170,12 +168,11 @@ const Board = () => {
       <Modal isOpen={isTaskDetailsModalOpen} setIsOpen={setIsTaskDetailsModalOpen}>
         {selectedTask && (
           <TaskDetails
-            id={selectedTask.id}
-            title={selectedTask.title}
-            boardColumns={boardColumns!}
-            status_={selectedTask.columnId}
-            description={selectedTask.description as null}
-            subtasks_={selectedTask.subtasks as null}
+            task={selectedTask}
+            onSubmit={(task) => {
+              console.log("task after updating status = ", task);
+              setSelectedTask(_.cloneDeep(task));
+            }}
             userActions={[
               {
                 title: "Edit",
@@ -200,10 +197,10 @@ const Board = () => {
       <Modal isOpen={isEditTaskDetailsModalOpen} setIsOpen={setIsEditTaskDetailsModalOpen}>
         {selectedTask && (
           <EditTask
-            onSubmit={(data) => {
+            onSubmit={(task) => {
               setIsEditTaskDetailsModalOpen(false);
+              setSelectedTask(_.cloneDeep(task));
             }}
-            boardColumns={boardColumns!}
             initialValues={selectedTask!}
           />
         )}
@@ -214,6 +211,9 @@ const Board = () => {
             id={selectedTask.id}
             title={selectedTask.title}
             onSubmit={(id) => {
+              if (id) {
+                deleteTask(id);
+              }
               setIsDeleteTaskModalOpen(false);
             }}
           />

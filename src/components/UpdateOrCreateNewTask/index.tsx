@@ -1,4 +1,4 @@
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
 import { styled } from "styled-components";
 import { findMaxByKey, generateTemporaryId } from "@/util";
 // components
@@ -54,27 +54,39 @@ const UpdateOrCreateNewTask = ({
   initialValues = null,
   onSubmit,
 }: {
-  initialValues?: null | Omit<Task, "order">;
+  initialValues?: null | Task;
   onSubmit: (task: Task) => void;
 }) => {
-  const isCreateMode = initialValues === null;
-  const { boardDetails, addTask } = useContext(BoardContext)!;
+  const isCreateMode = !initialValues;
+  const { boardDetails, addTask, editTask } = useContext(BoardContext)!;
   const [title, setTitle] = useState(isCreateMode ? "" : initialValues.title);
-  const taskId = isCreateMode ? generateTemporaryId() : initialValues.id;
+  const [taskId, setTaskId] = useState(() => (isCreateMode ? generateTemporaryId() : initialValues.id));
   const [description, setDescription] = useState<null | string>(isCreateMode ? null : initialValues.description);
   const [subtasks, setSubtasks] = useState(
     isCreateMode ? [{ id: generateTemporaryId(), value: "", order: 1, isDone: false, taskId }] : initialValues.subtasks
   );
-  const [status, setStatus] = useState(
-    isCreateMode
-      ? (boardDetails.data?.columns?.length || 0) > 0
-        ? boardDetails!.data!.columns![0].id
-        : ""
-      : initialValues.columnId
-  );
+  const [status, setStatus] = useState(() => {
+    if (isCreateMode) {
+      const columns = boardDetails.data?.columns;
+      return columns![0].id;
+    }
+    return initialValues?.columnId;
+  });
   const [isFormSubmitted, setIsFormSubmitted] = useState(false);
+  console.log("initialValues = ", initialValues);
+
+  useEffect(() => {
+    if (!isCreateMode) {
+      setTitle(initialValues.title);
+      setDescription(initialValues.description);
+      setStatus(initialValues.columnId);
+      setSubtasks(initialValues.subtasks);
+      console.log("useEffect running");
+    }
+  }, [initialValues, isCreateMode]);
 
   function resetFormToInitialState() {
+    setTaskId(generateTemporaryId());
     setTitle("");
     setDescription("");
     setSubtasks([{ id: generateTemporaryId(), value: "", order: 1, isDone: false, taskId }]);
@@ -123,7 +135,7 @@ const UpdateOrCreateNewTask = ({
                           const newState = _.cloneDeep(prev);
                           prev!.forEach((e) => {
                             if (e.id === subtask.id) {
-                              e.value = x.trim();
+                              e.value = x;
                             }
                           });
                           return newState;
@@ -174,7 +186,6 @@ const UpdateOrCreateNewTask = ({
             options={boardDetails.data!.columns!.map((bc) => ({
               id: bc.id,
               displayText: bc.title,
-              isSelected: status === bc.id,
             }))}
           />
         </StyledInputWrapper>
@@ -182,28 +193,39 @@ const UpdateOrCreateNewTask = ({
           <ButtonPrimarySmall
             onClick={() => {
               setIsFormSubmitted(true);
-              let order = 0;
-              boardDetails.data?.columns?.forEach((c) => {
-                if (c.id === status) {
-                  const maxOrder = findMaxByKey(c.tasks, (t) => t.order);
-                  order = maxOrder + 1;
-                }
-              });
-              const data = { title, description, subtasks, status, order };
-              if (isFormDataValid(data)) {
-                const newTask = {
-                  id: generateTemporaryId(),
-                  order,
-                  title: data.title,
-                  description: data.title,
-                  subtasks: data.subtasks,
-                  columnId: data.status,
-                };
-                onSubmit(newTask);
-                addTask(newTask);
-                if (isCreateMode) {
+              if (isCreateMode) {
+                let order = 0;
+                boardDetails.data?.columns?.forEach((c) => {
+                  if (c.id === status) {
+                    const maxOrder = findMaxByKey(c.tasks, (t) => t.order);
+                    order = maxOrder + 1;
+                  }
+                });
+                const data = { title, description, subtasks, status, order };
+                if (isFormDataValid(data)) {
+                  const task = {
+                    id: generateTemporaryId(),
+                    order,
+                    title: data.title,
+                    description: data.description,
+                    subtasks: data.subtasks,
+                    columnId: data.status,
+                  };
+                  onSubmit(task);
+                  addTask(task);
                   resetFormToInitialState();
                 }
+              } else {
+                const task = {
+                  title,
+                  id: initialValues.id,
+                  description,
+                  subtasks,
+                  columnId: status,
+                  order: initialValues.order,
+                };
+                editTask(task);
+                onSubmit(task);
               }
             }}
           >

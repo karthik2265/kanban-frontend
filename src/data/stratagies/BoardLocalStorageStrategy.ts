@@ -1,5 +1,6 @@
 import { Board, BoardColumn, BoardDetails, Task } from "@/types";
 import IBoardStorageStrategy from "./IBoardStorageStrategy";
+import { findMaxByKey } from "@/util";
 
 class BoardLocalStorageStrategy implements IBoardStorageStrategy {
   async getInitialData() {
@@ -14,12 +15,8 @@ class BoardLocalStorageStrategy implements IBoardStorageStrategy {
     if (!localStorage.getItem("boards")) {
       localStorage.setItem("boards", "[]");
     }
-    const boards: Board[] = JSON.parse(localStorage.getItem("boards")!);
-    const order =
-      (boards.reduce((x, y) => {
-        if (x.order > y.order) return x;
-        return y;
-      })?.order || 0) + 1;
+    const boards: Board[] = JSON.parse(localStorage.getItem("boards") || "[]");
+    const order = findMaxByKey(boards, (b) => b.order) + 1;
     const newBoard = { ...board, order, isSelected: true };
     boards.push(newBoard);
     localStorage.setItem("boards", JSON.stringify(boards));
@@ -86,22 +83,70 @@ class BoardLocalStorageStrategy implements IBoardStorageStrategy {
     let boardDetails: BoardDetails;
     const columnId = task.columnId;
     boards = JSON.parse(localStorage.getItem("boards") || "") || [];
-    console.log('boards in ls = ', boards);
     boards?.forEach((board) => {
       board.columns?.forEach((c) => {
         if (c.id === columnId) {
           if (c.tasks) {
             c.tasks?.push(task);
-            boardDetails = board;
           } else {
             c.tasks = [task];
           }
+          boardDetails = board;
         }
       });
     });
     localStorage.setItem("boards", JSON.stringify(boards));
     localStorage.setItem("boardDetails", JSON.stringify(boardDetails!));
     return task;
+  }
+
+  async editTask(task: Task) {
+    const boards: BoardDetails[] = JSON.parse(localStorage.getItem("boards")!);
+    const boardDetails: BoardDetails = JSON.parse(localStorage.getItem("boardDetails")!);
+    boardDetails?.columns?.forEach((c) => {
+      c.tasks?.forEach((t, i) => {
+        if (t.id === task.id) {
+          c.tasks?.splice(i, 1);
+        }
+      });
+    });
+    boardDetails?.columns?.forEach((c) => {
+      if (c.id === task.columnId) {
+        if (c.tasks) {
+          c.tasks.push(task);
+        } else {
+          c.tasks = [task];
+        }
+      }
+    });
+    boards.forEach((b, i) => {
+      if (b.id === boardDetails.id) {
+        boards[i] = boardDetails;
+      }
+    });
+    localStorage.setItem("boards", JSON.stringify(boards));
+    localStorage.setItem("boardDetails", JSON.stringify(boardDetails));
+    return task;
+  }
+
+  async deleteTask(taskId: string) {
+    const boards: BoardDetails[] = JSON.parse(localStorage.getItem("boards")!);
+    const boardDetails: BoardDetails = JSON.parse(localStorage.getItem("boardDetails")!);
+    boardDetails?.columns?.forEach((c) => {
+      c.tasks?.forEach((t, i) => {
+        if (t.id === taskId) {
+          c.tasks?.splice(i, 1);
+        }
+      });
+    });
+    boards.forEach((b, i) => {
+      if (b.id === boardDetails.id) {
+        boards[i] = boardDetails;
+      }
+    });
+    localStorage.setItem("boards", JSON.stringify(boards));
+    localStorage.setItem("boardDetails", JSON.stringify(boardDetails));
+    return taskId;
   }
 }
 
