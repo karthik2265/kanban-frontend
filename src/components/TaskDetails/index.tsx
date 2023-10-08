@@ -98,9 +98,11 @@ const TaskDetails = ({
       <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
         <MediumBoldBodyText isPrimary={false}>Current Status</MediumBoldBodyText>
         <Dropdown
-          options={boardDetails.data!.columns!.map((c) => {
-            return { id: c.id, displayText: c.title };
-          })}
+          options={
+            boardDetails.data?.columns?.map((c) => {
+              return { id: c.id, displayText: c.title };
+            }) || []
+          }
           value={status}
           onOptionSelect={(x) => {
             setStatus(x);

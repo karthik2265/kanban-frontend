@@ -18,7 +18,7 @@ import { StyledBoardWrapper, StyledColumnTasksWrapper, StyledNewColumn, StyledTa
 import EditBoard from "@/components/UpdateOrCreateNewBoard";
 import CreateNewBoard from "@/components/UpdateOrCreateNewBoard";
 
-import { rearrangeOrderAccordingToIndex } from "@/util";
+import { rearrangeOrderAccordingToIndex, sortByKey } from "@/util";
 
 const Board = () => {
   const { boardDetails, editBoard, deleteTask, editTask } = useContext(BoardContext)!;
@@ -51,10 +51,11 @@ const Board = () => {
         if (column.id === destinationColumnId) {
           tasksInDestinationColumn = column.tasks || [];
         }
-        column.tasks?.forEach((t) => {
+        column.tasks?.forEach((t, i) => {
           if (t.id === taskId) {
             task = t;
             task.columnId = destinationColumnId;
+            column.tasks?.splice(i, 1);
           }
         });
       });
@@ -68,6 +69,7 @@ const Board = () => {
       <DragDropContext onDragEnd={dragEndEventHandler}>
         {boardColumns &&
           boardColumns.map((column) => {
+            sortByKey(column.tasks || [], (x) => x.order);
             const Column = () => {
               return (
                 <div key={column.id}>

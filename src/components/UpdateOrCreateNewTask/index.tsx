@@ -180,10 +180,12 @@ const UpdateOrCreateNewTask = ({
               setStatus(id);
             }}
             value={status}
-            options={boardDetails.data!.columns!.map((bc) => ({
-              id: bc.id,
-              displayText: bc.title,
-            }))}
+            options={
+              boardDetails.data?.columns?.map((bc) => ({
+                id: bc.id,
+                displayText: bc.title,
+              })) || []
+            }
           />
         </StyledInputWrapper>
         <div style={{ marginTop: "0.5rem" }}>
