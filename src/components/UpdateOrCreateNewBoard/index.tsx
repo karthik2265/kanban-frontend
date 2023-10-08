@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Board, BoardColumn } from "@/types";
 import styled from "styled-components";
 import { generateTemporaryId } from "@/util";
@@ -141,7 +141,6 @@ const UpdateOrCreateNewBoard = ({ initialValues = null, onSubmit }: UpdateOrCrea
           </ButtonSecondary>
           <div style={{ marginTop: "1.15rem" }}>
             <ButtonPrimaryLarge
-              height="2.5rem"
               onClick={() => {
                 setIsFormSubmitted(true);
                 if (isDataValid({ title, columns })) {

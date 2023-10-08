@@ -158,7 +158,6 @@ const Board = () => {
           <TaskDetails
             task={selectedTask}
             onSubmit={(task) => {
-              console.log("task after updating status = ", task);
               setSelectedTask(_.cloneDeep(task));
             }}
             userActions={[

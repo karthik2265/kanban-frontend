@@ -1,6 +1,8 @@
 import { useState, useContext, useEffect } from "react";
 import { styled } from "styled-components";
 import { findMaxByKey, generateTemporaryId } from "@/util";
+import _ from "lodash";
+import { BoardContext } from "@/context/BoardContext";
 // components
 import LargeHeading from "@/components/typography/LargeHeading";
 import MediumBoldBodyText from "@/components/typography/MediumBoldBodyText";
@@ -11,9 +13,6 @@ import { Subtask, Task } from "@/types";
 import Dropdown from "@/components/inputs/Dropdown";
 import ButtonPrimarySmall from "@/components/buttons/ButtonPrimarySmall";
 import Textarea from "@/components/inputs/Textarea";
-
-import _ from "lodash";
-import { BoardContext } from "@/context/BoardContext";
 
 const StyledWrapper = styled.div`
   width: 30rem;
@@ -73,7 +72,6 @@ const UpdateOrCreateNewTask = ({
     return initialValues?.columnId;
   });
   const [isFormSubmitted, setIsFormSubmitted] = useState(false);
-  console.log("initialValues = ", initialValues);
 
   useEffect(() => {
     if (!isCreateMode) {
@@ -81,7 +79,6 @@ const UpdateOrCreateNewTask = ({
       setDescription(initialValues.description);
       setStatus(initialValues.columnId);
       setSubtasks(initialValues.subtasks);
-      console.log("useEffect running");
     }
   }, [initialValues, isCreateMode]);
 
@@ -240,7 +237,6 @@ const UpdateOrCreateNewTask = ({
 function isFormDataValid({
   title,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  description,
   subtasks,
   status,
 }: {
