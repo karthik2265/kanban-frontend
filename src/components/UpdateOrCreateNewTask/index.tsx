@@ -128,14 +128,13 @@ const UpdateOrCreateNewTask = ({
                       errorMessage="Can't be empty"
                       value={subtask.value}
                       onChange={(x) => {
-                        setSubtasks((prev) => {
-                          const newState = _.cloneDeep(prev);
-                          prev!.forEach((e) => {
+                        setSubtasks((prevSubtasks) => {
+                          return prevSubtasks?.map((e) => {
                             if (e.id === subtask.id) {
-                              e.value = x;
+                              return { ...e, value: x };
                             }
-                          });
-                          return newState;
+                            return e;
+                          }) || [];
                         });
                       }}
                     />

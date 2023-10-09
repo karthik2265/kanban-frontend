@@ -163,7 +163,7 @@ const Board = () => {
             }}
             userActions={[
               {
-                title: "Edit",
+                title: "Edit Task",
                 isDangerAction: false,
                 onClick: () => {
                   setIsTaskDetailsModalOpen(false);
@@ -171,7 +171,7 @@ const Board = () => {
                 },
               },
               {
-                title: "Delete",
+                title: "Delete Task",
                 isDangerAction: true,
                 onClick: () => {
                   setIsTaskDetailsModalOpen(false);

@@ -52,13 +52,15 @@ const TaskDetails = ({
     <StyledWrapper>
       <div style={{ display: "flex", justifyContent: "space-between", gap: "1.25rem", alignItems: "center" }}>
         <LargeHeading>{title}</LargeHeading>
-        <MoreOptions
-          options={userActions.map((action) => ({
-            text: action.title,
-            isDangerOption: action.isDangerAction,
-            onClick: () => action.onClick(),
-          }))}
-        />
+        <div style={{ position: "relative", zIndex: 10 }}>
+          <MoreOptions
+            options={userActions.map((action) => ({
+              text: action.title,
+              isDangerOption: action.isDangerAction,
+              onClick: () => action.onClick(),
+            }))}
+          />
+        </div>
       </div>
       <div>
         <MediumBodyText isPrimary={false}>{description}</MediumBodyText>

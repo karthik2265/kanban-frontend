@@ -94,8 +94,8 @@ const Menu = () => {
           {boardDetails.data && (
             <MoreOptions
               options={[
-                { text: "Edit", isDangerOption: false, onClick: () => setIsEditBoardModalOpen(true) },
-                { text: "Delete", isDangerOption: true, onClick: () => setIsDeleteBoardModalOpen(true) },
+                { text: "Edit Board", isDangerOption: false, onClick: () => setIsEditBoardModalOpen(true) },
+                { text: "Delete Board", isDangerOption: true, onClick: () => setIsDeleteBoardModalOpen(true) },
               ]}
             />
           )}
