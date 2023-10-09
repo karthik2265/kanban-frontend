@@ -63,7 +63,7 @@ const TaskDetails = ({
       <div>
         <MediumBodyText isPrimary={false}>{description}</MediumBodyText>
       </div>
-      {subtasks && (
+      {subtasks && subtasks.length > 0 && (
         <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
           <MediumBoldBodyText isPrimary={false}>
             {`Subtasks (${subtasks.filter((x) => x.isDone).length} of ${subtasks.length})`}
