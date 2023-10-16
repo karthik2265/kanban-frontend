@@ -8,7 +8,7 @@ import { sortByKey } from "@/util";
 const BoardContext = createContext<null | {
   boards: State["boards"];
   boardDetails: State["boardDetails"];
-  addBoard: (board: Omit<Board, "order"> & { columns: BoardColumn[] | null }) => void;
+  addBoard: (board: Board & { columns: BoardColumn[] | null }) => void;
   editBoard: (board: Board & { columns: BoardColumn[] | null }) => void;
   deleteBoard: (id: string) => void;
   updateSelectedBoardAndFetchBoardDetails: (id: string) => void;
@@ -270,7 +270,7 @@ function BoardContextProvider({ children }: { children: ReactNode }) {
   );
   const { startProcessing: addBoard } = useData<
     Board & { columns: BoardColumn[] | null },
-    Omit<Board & { columns: BoardColumn[] | null }, "order">
+    Board & { columns: BoardColumn[] | null }
   >(boardDataManager.addBoard, addBoardStateDispatcher);
 
   // update selected board meaning have to fetch board details also

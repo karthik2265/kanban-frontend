@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState } from "react";
 import { Board, BoardColumn } from "@/types";
 import styled from "styled-components";
-import { generateTemporaryId } from "@/util";
+import { findMaxByKey, generateTemporaryId } from "@/util";
 // components
 import LargeHeading from "@/components/typography/LargeHeading";
 import MediumBoldBodyText from "@/components/typography/MediumBoldBodyText";
@@ -146,7 +146,7 @@ const UpdateOrCreateNewBoard = ({ initialValues = null, onSubmit }: UpdateOrCrea
                 if (isDataValid({ title, columns })) {
                   const id = initialValues?.id || generateTemporaryId();
                   if (isCreateMode) {
-                    addBoard({ title, id, columns });
+                    addBoard({ title, id, columns, order: findMaxByKey(boards.data, (b) => b.order) + 1 });
                     // reset form to initial state
                     setTitle("");
                     setColumns(defaultColumns);

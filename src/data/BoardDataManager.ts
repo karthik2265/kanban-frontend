@@ -20,7 +20,7 @@ export class BoardDataManager {
     this.strategy = newStrategy;
   }
 
-  addBoard(data: Omit<Board & { columns: BoardColumn[] | null }, "order">) {
+  addBoard(data: Board & { columns: BoardColumn[] | null }) {
     return this.strategy.addBoard(data);
   }
 
