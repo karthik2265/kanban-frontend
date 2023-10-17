@@ -65,6 +65,24 @@ export const StyledDownArrowIconWrapper = styled.div<{ $isSecondaryMenuOpen: boo
 
 // *** right side section -> start
 
+export const StyledLoginButton = styled.div`
+  display: flex;
+  padding: 0.5rem 1.5rem;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  border-radius: 1.5rem;
+  border: 2px solid ${(props) => props.theme.mainPurple};
+
+  &:hover {
+    cursor: pointer;
+  }
+
+  &:active {
+    scale: 0.96;
+  }
+`;
+
 export const StyledAddNewTaskActionButton = styled.div<{ $isAvailable: boolean }>`
   width: 10.25rem;
   height: 3rem;

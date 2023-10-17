@@ -12,6 +12,7 @@ import {
   StyledActionsWrapper,
   StyledBoardTitleWrapper,
   StyledDownArrowIconWrapper,
+  StyledLoginButton,
 } from "./StyledComponents";
 import Logo from "@/components/Logo";
 import ExtraLargeHeading from "@/components/typography/ExtraLargeHeading";
@@ -22,6 +23,7 @@ import EditBoard from "@/components/UpdateOrCreateNewBoard";
 import DeleteBoard from "@/components/DeleteBoard";
 import MoreOptions from "@/components/MoreOptions";
 import LargeHeading from "@/components/typography/LargeHeading";
+import GitHubIcon from "@/components/icons/Github";
 
 const Menu = () => {
   const { isSecondaryMenuOpen, toggleSecondaryMenuVisibility } = useContext(RootLayoutContext)!;
@@ -56,7 +58,14 @@ const Menu = () => {
               login();
             }}
           >
-            <LargeHeading> {user ? `Profile` : "Login with github"}</LargeHeading>
+            {user ? (
+              null
+            ) : (
+              <StyledLoginButton>
+                <GitHubIcon />
+                <LargeHeading>Login</LargeHeading>
+              </StyledLoginButton>
+            )}
           </div>
           <StyledAddNewTaskActionButton
             $isAvailable={!!(boardDetails.data?.columns && boardDetails.data.columns.length > 0)}

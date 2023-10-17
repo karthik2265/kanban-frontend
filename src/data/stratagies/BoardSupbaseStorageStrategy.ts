@@ -19,15 +19,19 @@ class BoardSupbaseStorageStrategy implements IBoardStorageStrategy {
       newlyCreatedBoard.title = boardTableData![0].title;
       newlyCreatedBoard.id = boardTableData![0].id;
       if (board.columns) {
-        const { data: columnTableData } = await supbase.from("board_columns").insert(
-          board.columns.map((bc) => {
-            return {
-              title: bc.title,
-              board_id: boardTableData![0].id,
-              order: bc.order,
-            };
-          })
-        );
+        const { data: columnTableData } = await supbase
+          .from("board_columns")
+          .insert(
+            board.columns.map((bc) => {
+              return {
+                title: bc.title,
+                board_id: boardTableData![0].id,
+                order: bc.order,
+              };
+            })
+          )
+          .select()
+          .throwOnError();
         newlyCreatedBoard.columns = columnTableData;
       }
       await supbase.from("board_users").insert([{ board_id: boardTableData![0].id, order: board }]);
