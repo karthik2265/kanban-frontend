@@ -62,6 +62,12 @@ export class BoardDataManager {
   deleteTask(taskId: string) {
     return this.strategy.deleteTask(taskId);
   }
+
+  migrateDataFromLocalStorageToSupbase() {
+    const boards: BoardDetails[] = JSON.parse(localStorage.getItem("boards") || "[]");
+    if (boards.length <= 0) return;
+    
+  }
 }
 
 export default BoardDataManager;

@@ -1,7 +1,9 @@
-import Logo from "@/components/Logo";
-import ExtraLargeHeading from "@/components/typography/ExtraLargeHeading";
 import { RootLayoutContext } from "@/context/RootLayoutContext";
 import { useContext, useState } from "react";
+import { truncateText } from "@/util";
+import { BoardContext } from "@/context/BoardContext";
+import { UserContext } from "@/context/UserContext";
+// components
 import {
   StyledMenuWrapper,
   StyledLogoWrapper,
@@ -11,42 +13,20 @@ import {
   StyledBoardTitleWrapper,
   StyledDownArrowIconWrapper,
 } from "./StyledComponents";
+import Logo from "@/components/Logo";
+import ExtraLargeHeading from "@/components/typography/ExtraLargeHeading";
 import DownArrowIcon from "@/components/icons/DownArrow";
-import { truncateText } from "@/util";
 import Modal from "@/components/Modal";
 import NewTask from "@/components/UpdateOrCreateNewTask";
 import EditBoard from "@/components/UpdateOrCreateNewBoard";
 import DeleteBoard from "@/components/DeleteBoard";
 import MoreOptions from "@/components/MoreOptions";
-// import LargeHeading from "@/components/typography/LargeHeading";
-// import supabase from "@/supbaseClient";
-import { BoardContext } from "@/context/BoardContext";
+import LargeHeading from "@/components/typography/LargeHeading";
 
 const Menu = () => {
-  // const [user, setUser] = useState<null | { id: string }>(null);
-
-  // useEffect(() => {
-  //   // Set the user immediately if already signed in
-  //   supabase.auth.getSession().then(({ data, error }) => {
-  //     if (data.session) {
-  //       setUser(data.session.user);
-  //     }
-  //   });
-
-  //   // Subscribe to auth changes
-  //   const { data: authSubscription } = supabase.auth.onAuthStateChange((event, session) => {
-  //     if (event === "SIGNED_IN" && session) {
-  //       setUser(session.user);
-  //     }
-  //   });
-
-  //   // Cleanup the subscription on unmount
-  //   return () => {
-  //     authSubscription.subscription.unsubscribe();
-  //   };
-  // }, []);
   const { isSecondaryMenuOpen, toggleSecondaryMenuVisibility } = useContext(RootLayoutContext)!;
   const { boardDetails, editBoard, deleteBoard } = useContext(BoardContext)!;
+  const { user, login } = useContext(UserContext)!;
   // modals
   const [isNewTaskModalOpen, setIsNewTaskModalOpen] = useState(false);
   const [isEditBoardModalOpen, setIsEditBoardModalOpen] = useState(false);
@@ -73,10 +53,10 @@ const Menu = () => {
           <div
             onClick={async (event) => {
               event.preventDefault();
-              // const { user, data, error } = await supabase.auth.signInWithOAuth({ provider: "github" });
+              login();
             }}
           >
-            {/* <LargeHeading> {user ? `Profile` : "Login with github"}</LargeHeading> */}
+            <LargeHeading> {user ? `Profile` : "Login with github"}</LargeHeading>
           </div>
           <StyledAddNewTaskActionButton
             $isAvailable={!!(boardDetails.data?.columns && boardDetails.data.columns.length > 0)}
