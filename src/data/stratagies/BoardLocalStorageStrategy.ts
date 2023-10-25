@@ -11,7 +11,7 @@ class BoardLocalStorageStrategy implements IBoardStorageStrategy {
     return { boards, boardDetails };
   }
 
-  async addBoard(board: Board & { columns: BoardColumn[] | null }) {
+  async addBoard({ board }: { board: Board & { columns: BoardColumn[] | null } }) {
     if (!localStorage.getItem("boards")) {
       localStorage.setItem("boards", "[]");
     }

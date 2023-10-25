@@ -1,10 +1,16 @@
 import { Board, BoardColumn, BoardDetails, Task } from "@/types";
 
 interface IBoardStorageStrategy {
-  getInitialData(): Promise<{ boards: Board[] | null; boardDetails: BoardDetails | null } | null>;
-  addBoard(board: Board & { columns: BoardColumn[] | null }): Promise<Board & { columns: BoardColumn[] | null }>;
+  getInitialData(userId?: string): Promise<{ boards: Board[] | null; boardDetails: BoardDetails | null } | null>;
+  addBoard({
+    board,
+    userId,
+  }: {
+    board: Board & { columns: BoardColumn[] | null };
+    userId?: string;
+  }): Promise<Board & { columns: BoardColumn[] | null }>;
   editBoard(
-    board: Omit<Board & { columns: BoardColumn[] | null }, "order">
+    board: Board & { columns: BoardColumn[] | null }
   ): Promise<Board & { columns: BoardColumn[] | null }>;
   deleteBoard(id: string): Promise<string>;
   getBoardDetails(id: string): Promise<BoardDetails>;

@@ -4,6 +4,7 @@ import _ from "lodash";
 import useData from "@/hooks/useData";
 import { DataContext } from "./DataContext";
 import { sortByKey } from "@/util";
+import { UserContext } from "./UserContext";
 
 const BoardContext = createContext<null | {
   boards: State["boards"];
@@ -109,6 +110,9 @@ function reducer(state: State, action: Action) {
   const updatedState = _.cloneDeep(state);
   switch (action.type) {
     case "UPDATE_BOARDS":
+      if (action.payload.data) {
+        sortByKey(action.payload.data, (b) => b.order);
+      }
       updatedState.boards = { ...action.payload };
       break;
     case "UPDATE_BOARD_DETAILS":
@@ -171,8 +175,7 @@ function reducer(state: State, action: Action) {
         // delete the board
         updatedState.boards.data =
           updatedState.boards.data?.filter((b) => b.id !== action.payload.data?.deletedBoardId) || null;
-        // select another board
-        updatedState.boardDetails.data = action.payload.data.boardDetails;
+        updatedState.boardDetails.data = null;
       }
       updatedState.boardDetails.error = action.payload.error;
       updatedState.boardDetails.isProcessing = action.payload.isProcessing;
@@ -240,6 +243,7 @@ function reducer(state: State, action: Action) {
 function BoardContextProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(reducer, initialState);
   const { boardDataManager } = useContext(DataContext)!;
+  const { user } = useContext(UserContext)!;
   // get all boards and board details initially
   const getInitialDataStateDispatcher = useCallback(
     (s: {
@@ -254,12 +258,16 @@ function BoardContextProvider({ children }: { children: ReactNode }) {
   );
   const { startProcessing: fetchInitialData } = useData<
     { boards: Board[] | null; boardDetails: BoardDetails | null },
-    void
+    string | undefined
   >(boardDataManager.getInitialData, getInitialDataStateDispatcher);
 
   useEffect(() => {
-    fetchInitialData();
-  }, [fetchInitialData]);
+    if (user) {
+      fetchInitialData(user.id);
+    } else {
+      fetchInitialData(undefined);
+    }
+  }, [fetchInitialData, user]);
 
   // add board
   const addBoardStateDispatcher = useCallback(
@@ -270,8 +278,18 @@ function BoardContextProvider({ children }: { children: ReactNode }) {
   );
   const { startProcessing: addBoard } = useData<
     Board & { columns: BoardColumn[] | null },
-    Board & { columns: BoardColumn[] | null }
+    { data: Board & { columns: BoardColumn[] | null }; userId?: string }
   >(boardDataManager.addBoard, addBoardStateDispatcher);
+  const addBoardHandler = useCallback(
+    (board: Board & { columns: BoardColumn[] | null }) => {
+      if (user) {
+        addBoard({ data: board, userId: user.id });
+      } else {
+        addBoard({ data: board });
+      }
+    },
+    [addBoard, user]
+  );
 
   // update selected board meaning have to fetch board details also
   const fetchBoardDetailsStateDispatcher = useCallback(
@@ -366,7 +384,7 @@ function BoardContextProvider({ children }: { children: ReactNode }) {
     return {
       boards: state.boards,
       boardDetails: state.boardDetails,
-      addBoard,
+      addBoard: addBoardHandler,
       editBoard,
       deleteBoard,
       updateSelectedBoardAndFetchBoardDetails,
@@ -375,7 +393,7 @@ function BoardContextProvider({ children }: { children: ReactNode }) {
       deleteTask,
     };
   }, [
-    addBoard,
+    addBoardHandler,
     addTask,
     deleteBoard,
     deleteTask,

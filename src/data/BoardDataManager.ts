@@ -20,8 +20,8 @@ export class BoardDataManager {
     this.strategy = newStrategy;
   }
 
-  addBoard(data: Board & { columns: BoardColumn[] | null }) {
-    return this.strategy.addBoard(data);
+  addBoard({ data, userId }: { data: Board & { columns: BoardColumn[] | null }; userId?: string }) {
+    return this.strategy.addBoard({ board: data, userId });
   }
 
   editBoard(data: Board & { columns: BoardColumn[] | null }) {
@@ -43,8 +43,8 @@ export class BoardDataManager {
     return { deletedBoardId, boardDetails };
   }
 
-  getInitialData() {
-    return this.strategy.getInitialData();
+  getInitialData(userId: string | undefined) {
+    return this.strategy.getInitialData(userId);
   }
 
   getBoardDetails(id: string) {
@@ -66,7 +66,6 @@ export class BoardDataManager {
   migrateDataFromLocalStorageToSupbase() {
     const boards: BoardDetails[] = JSON.parse(localStorage.getItem("boards") || "[]");
     if (boards.length <= 0) return;
-    
   }
 }
 
