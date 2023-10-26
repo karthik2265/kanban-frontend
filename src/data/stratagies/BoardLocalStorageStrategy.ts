@@ -65,13 +65,13 @@ class BoardLocalStorageStrategy implements IBoardStorageStrategy {
     return id;
   }
 
-  async getBoardDetails(id: string): Promise<BoardDetails> {
+  async getBoardDetails({ board }: { board: Board }): Promise<BoardDetails> {
     // in local storage we just store the entire data of a board in boards array
     let boards: BoardDetails[] | null = null;
     let boardDetails: BoardDetails | null = null;
     boards = JSON.parse(localStorage.getItem("boards") || "") || [];
-    boards?.forEach((board) => {
-      if (board.id === id) boardDetails = board;
+    boards?.forEach((b) => {
+      if (b.id === board.id) boardDetails = b;
     });
     localStorage.setItem("boardDetails", JSON.stringify(boardDetails));
     return boardDetails!;

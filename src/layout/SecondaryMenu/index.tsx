@@ -49,7 +49,7 @@ const SecondaryMenu = () => {
                 key={board.id}
                 onClick={() => {
                   toggleSecondaryMenuVisibility();
-                  updateSelectedBoardAndFetchBoardDetails(board.id);
+                  updateSelectedBoardAndFetchBoardDetails(board);
                 }}
                 $isActive={board.id === boardDetails.data?.id}
               >

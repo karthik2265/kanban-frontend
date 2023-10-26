@@ -30,15 +30,17 @@ export class BoardDataManager {
 
   async deleteBoardAndFetchBoardDetails({
     deleteBoardId,
-    fetchBoardDetailsId,
+    fetchBoard,
+    userId,
   }: {
     deleteBoardId: string;
-    fetchBoardDetailsId: string | null;
+    fetchBoard: Board | null;
+    userId?: string;
   }) {
     const deletedBoardId = await this.strategy.deleteBoard(deleteBoardId);
     let boardDetails: null | BoardDetails = null;
-    if (fetchBoardDetailsId) {
-      boardDetails = await this.strategy.getBoardDetails(fetchBoardDetailsId);
+    if (fetchBoard) {
+      boardDetails = await this.strategy.getBoardDetails({ board: fetchBoard, userId });
     }
     return { deletedBoardId, boardDetails };
   }
@@ -47,8 +49,8 @@ export class BoardDataManager {
     return this.strategy.getInitialData(userId);
   }
 
-  getBoardDetails(id: string) {
-    return this.strategy.getBoardDetails(id);
+  getBoardDetails({ board, userId }: { board: Board; userId?: string }) {
+    return this.strategy.getBoardDetails({ board, userId });
   }
 
   addTask(task: Task) {

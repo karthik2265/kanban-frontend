@@ -1,4 +1,4 @@
-import { Board, BoardDetails, BoardColumn, Task, Subtask } from "@/types";
+import { Board, BoardDetails, BoardColumn, Task } from "@/types";
 import IBoardStorageStrategy from "./IBoardStorageStrategy";
 import supbase from "@/supbaseClient";
 
@@ -46,8 +46,8 @@ class BoardSupbaseStorageStrategy implements IBoardStorageStrategy {
           )
           .eq("board_id", boardId)
           .throwOnError();
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const boardColumnsPromises =
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           boardColumnsData?.map(async (column: { [key: string]: any }) => {
             const { data: tasksData } = await supbase
               .from("tasks")
@@ -60,8 +60,8 @@ class BoardSupbaseStorageStrategy implements IBoardStorageStrategy {
             `
               )
               .eq("board_column_id", column.id);
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const tasksPromises =
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
               tasksData?.map(async (task: { [key: string]: any }) => {
                 const { data: subtasksData } = await supbase
                   .from("subtasks")
@@ -179,6 +179,7 @@ class BoardSupbaseStorageStrategy implements IBoardStorageStrategy {
             .select("id")
             .throwOnError();
           columnsNotToBeDeleted.push(columnId![0].id);
+          c.id = columnId![0].id;
         }) || [];
       await Promise.all(columnsTableUpdatesPromises);
       await supbase
@@ -204,17 +205,82 @@ class BoardSupbaseStorageStrategy implements IBoardStorageStrategy {
     }
   }
 
-  getBoardDetails(id: string): Promise<BoardDetails> {
-    throw new Error("Method not implemented.");
-    // get order from board_users table
-
-    // get title from boards table
-
-    // get id, title, order of columns from columns table
-
-    // get id, title, description, order, columnId from tasks table
-
-    // get id, value, isDone, order from subtasks table
+  async getBoardDetails({ board, userId }: { board: Board; userId?: string }): Promise<BoardDetails> {
+    try {
+      // get id, title, order of columns from columns table
+      const { data: boardColumnsData } = await supbase
+        .from("board_columns")
+        .select(
+          `
+            id,
+            title,
+            order
+            `
+        )
+        .eq("board_id", board.id)
+        .throwOnError();
+      const boardColumnsPromises =
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        boardColumnsData?.map(async (column: { [key: string]: any }) => {
+          const { data: tasksData } = await supbase
+            .from("tasks")
+            .select(
+              `
+            id,
+            title,
+            description,
+            order
+            `
+            )
+            .eq("board_column_id", column.id);
+          const tasksPromises =
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            tasksData?.map(async (task: { [key: string]: any }) => {
+              const { data: subtasksData } = await supbase
+                .from("subtasks")
+                .select(
+                  `
+              id,
+              value,
+              is_done,
+              order
+              `
+                )
+                .eq("task_id", task.id)
+                .throwOnError();
+              task["subtasks"] = subtasksData?.map((st) => {
+                return {
+                  ...st,
+                  isDone: st.is_done,
+                  taskId: task.id,
+                };
+              });
+            }) || [];
+          await Promise.all(tasksPromises);
+          column["tasks"] = tasksData?.map((t) => {
+            return {
+              ...t,
+              columnId: column.id,
+            };
+          });
+        }) || [];
+      await Promise.all(boardColumnsPromises);
+      await supbase
+        .from("user_preferences")
+        .upsert({ selected_board_id: board.id }, { onConflict: "user_id" })
+        .eq("user_id", userId)
+        .throwOnError();
+      const boardDetails = {
+        id: board.id,
+        title: board.title,
+        order: board.order,
+        columns: boardColumnsData,
+      } as BoardDetails;
+      return boardDetails;
+    } catch (err) {
+      console.error("Something went wrong while fetching board details");
+      throw err;
+    }
   }
 
   async addTask(task: Task): Promise<Task> {
@@ -228,6 +294,7 @@ class BoardSupbaseStorageStrategy implements IBoardStorageStrategy {
         .throwOnError();
       const taskId = taskData![0].id;
       const newTask: Task = taskData![0];
+      newTask.columnId = taskData![0].board_column_id;
       if (task?.subtasks) {
         const { data: subtasksData } = await supbase
           .from("subtasks")
@@ -236,9 +303,16 @@ class BoardSupbaseStorageStrategy implements IBoardStorageStrategy {
               return { value: st.value, task_id: taskId, is_done: st.isDone, order: st.order };
             })
           )
-          .select()
+          .select(`id, value, task_id, is_done, order`)
           .throwOnError();
-        newTask.subtasks = subtasksData;
+        newTask.subtasks =
+          subtasksData?.map((st) => ({
+            id: st.id,
+            value: st.value,
+            taskId: st.task_id,
+            isDone: st.is_done,
+            order: st.order,
+          })) || [];
       }
       return newTask;
     } catch (err) {
@@ -247,11 +321,47 @@ class BoardSupbaseStorageStrategy implements IBoardStorageStrategy {
     }
   }
 
-  editTask(task: Task): Promise<Task> {
-    throw new Error("Method not implemented.");
-    // update title, columnId, order, description in tasks table
-
-    // update value, is_done in subtasks table
+  async editTask(task: Task): Promise<Task> {
+    try {
+      // update title, columnId, order, description in tasks table
+      await supbase
+        .from("tasks")
+        .update({ title: task.title, board_column_id: task.columnId, description: task.description, order: task.order })
+        .eq("id", task.id)
+        .throwOnError();
+      // update value, is_done in subtasks table
+      const subtasksNotToBeDeleted: string[] = [];
+      const subtasksPromises =
+        task.subtasks?.map(async (st) => {
+          const { data: subtaskId } = await supbase
+            .from("subtasks")
+            .upsert(
+              {
+                value: st.value,
+                is_done: st.isDone,
+                order: st.order,
+                task_id: st.taskId,
+              },
+              { onConflict: "id" }
+            )
+            .eq("id", st.id)
+            .select("id")
+            .throwOnError();
+          st.id = subtaskId![0]!.id;
+          subtasksNotToBeDeleted.push(st.id);
+        }) || [];
+      await Promise.all(subtasksPromises);
+      await supbase
+        .from("subtasks")
+        .delete()
+        .filter("task_id", "eq", task.id)
+        .filter("id", "not.in", `(${subtasksNotToBeDeleted.join(",")})`)
+        .throwOnError();
+      return task;
+    } catch (err) {
+      console.error("Something went wrong while updating the task");
+      throw err;
+    }
   }
 
   async deleteTask(taskId: string): Promise<string> {

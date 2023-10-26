@@ -12,7 +12,7 @@ const BoardContext = createContext<null | {
   addBoard: (board: Board & { columns: BoardColumn[] | null }) => void;
   editBoard: (board: Board & { columns: BoardColumn[] | null }) => void;
   deleteBoard: (id: string) => void;
-  updateSelectedBoardAndFetchBoardDetails: (id: string) => void;
+  updateSelectedBoardAndFetchBoardDetails: (board: Board) => void;
   addTask: (task: Task) => void;
   editTask: (task: Task) => void;
   deleteTask: (taskId: string) => void;
@@ -193,6 +193,7 @@ function reducer(state: State, action: Action) {
             }
           }
         });
+        console.log(task);
       }
       updatedState.boardDetails.isProcessing = action.payload.isProcessing;
       updatedState.boardDetails.error = action.payload.error;
@@ -298,16 +299,16 @@ function BoardContextProvider({ children }: { children: ReactNode }) {
     },
     [dispatch]
   );
-  const { startProcessing: fetchBoardDetails } = useData<BoardDetails, string>(
+  const { startProcessing: fetchBoardDetails } = useData<BoardDetails, { board: Board; userId?: string }>(
     boardDataManager.getBoardDetails,
     fetchBoardDetailsStateDispatcher
   );
 
   const updateSelectedBoardAndFetchBoardDetails = useCallback(
-    (id: string) => {
-      fetchBoardDetails(id);
+    (board: Board) => {
+      fetchBoardDetails({ board, userId: user?.id });
     },
-    [fetchBoardDetails]
+    [fetchBoardDetails, user]
   );
 
   // edit board
@@ -339,15 +340,15 @@ function BoardContextProvider({ children }: { children: ReactNode }) {
       deletedBoardId: string;
       boardDetails: BoardDetails | null;
     },
-    { deleteBoardId: string; fetchBoardDetailsId: string | null }
+    { deleteBoardId: string; fetchBoard: Board | null; userId?: string }
   >(boardDataManager.deleteBoardAndFetchBoardDetails, deleteBoardStateDispatcher);
 
   const deleteBoard = useCallback(
     (id: string) => {
-      const fetchBoardDetailsId = state.boards.data ? state.boards.data.find((b) => b.id != id)?.id || null : null;
-      deleteBoardAndFetchBoardDetails({ deleteBoardId: id, fetchBoardDetailsId });
+      const fetchBoard = state.boards.data ? state.boards.data.find((b) => b.id != id) || null : null;
+      deleteBoardAndFetchBoardDetails({ deleteBoardId: id, fetchBoard, userId: user?.id });
     },
-    [deleteBoardAndFetchBoardDetails, state.boards.data]
+    [deleteBoardAndFetchBoardDetails, state.boards.data, user]
   );
 
   // add task
