@@ -33,7 +33,7 @@ const Board = () => {
   const [isCreateNewBoardModalOpen, setIsCreateNewBoardModalOpen] = useState(false);
   const [isEditBoardModalOpen, setIsEditBoardModalOpen] = useState(false);
 
-  function dragEndEventHandler(result: DropResult) {
+  async function dragEndEventHandler(result: DropResult) {
     // adjust order of tasks in columns based on where the task is dragged
     const { source, destination } = result;
     if (destination) {
@@ -60,7 +60,9 @@ const Board = () => {
       });
       tasksInDestinationColumn.splice(taskIndexInDestinationColumn, 0, task!);
       rearrangeOrderAccordingToIndex(tasksInDestinationColumn);
-      editTask(task!);
+      console.log("tasksInDestinationColumn = ", tasksInDestinationColumn);
+      const editTasksPromises = tasksInDestinationColumn.map((t) => editTask(t));
+      await Promise.all(editTasksPromises);
     }
   }
   return (
@@ -185,7 +187,7 @@ const Board = () => {
       <Modal isOpen={isEditTaskDetailsModalOpen} setIsOpen={setIsEditTaskDetailsModalOpen}>
         {selectedTask && (
           <EditTask
-            onSubmit={(task) => {
+            onSubmit={(task: Task) => {
               setIsEditTaskDetailsModalOpen(false);
               setSelectedTask(_.cloneDeep(task));
             }}

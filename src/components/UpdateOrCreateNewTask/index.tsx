@@ -60,6 +60,7 @@ const UpdateOrCreateNewTask = ({
   const { boardDetails, addTask, editTask } = useContext(BoardContext)!;
   const [title, setTitle] = useState(isCreateMode ? "" : initialValues.title);
   const [taskId, setTaskId] = useState(() => (isCreateMode ? generateTemporaryId() : initialValues.id));
+  console.log("taskId in Task component = ", taskId);
   const [description, setDescription] = useState<null | string>(isCreateMode ? null : initialValues.description);
   const [subtasks, setSubtasks] = useState(
     isCreateMode ? [{ id: generateTemporaryId(), value: "", order: 1, isDone: false, taskId }] : initialValues.subtasks
@@ -79,6 +80,7 @@ const UpdateOrCreateNewTask = ({
       setDescription(initialValues.description);
       setStatus(initialValues.columnId);
       setSubtasks(initialValues.subtasks);
+      setTaskId(initialValues.id);
     }
   }, [initialValues, isCreateMode]);
 
@@ -129,12 +131,14 @@ const UpdateOrCreateNewTask = ({
                       value={subtask.value}
                       onChange={(x) => {
                         setSubtasks((prevSubtasks) => {
-                          return prevSubtasks?.map((e) => {
-                            if (e.id === subtask.id) {
-                              return { ...e, value: x };
-                            }
-                            return e;
-                          }) || [];
+                          return (
+                            prevSubtasks?.map((e) => {
+                              if (e.id === subtask.id) {
+                                return { ...e, value: x };
+                              }
+                              return e;
+                            }) || []
+                          );
                         });
                       }}
                     />

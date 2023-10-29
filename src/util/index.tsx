@@ -1,4 +1,4 @@
-import { nanoid } from "nanoid";
+import { v4 as uuid } from "uuid";
 
 function truncateText(str: string | null, count: number) {
   if (!str || str.length < count) return str;
@@ -6,7 +6,7 @@ function truncateText(str: string | null, count: number) {
 }
 
 function generateTemporaryId() {
-  return `tempId-${nanoid()}`;
+  return uuid();
 }
 
 function sortByKey<T>(arr: T[], keyExtractor: (item: T) => number) {

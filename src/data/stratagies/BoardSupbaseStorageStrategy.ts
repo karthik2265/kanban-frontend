@@ -323,6 +323,7 @@ class BoardSupbaseStorageStrategy implements IBoardStorageStrategy {
 
   async editTask(task: Task): Promise<Task> {
     try {
+      console.log("task to be edited", task);
       // update title, columnId, order, description in tasks table
       await supbase
         .from("tasks")
@@ -335,16 +336,14 @@ class BoardSupbaseStorageStrategy implements IBoardStorageStrategy {
         task.subtasks?.map(async (st) => {
           const { data: subtaskId } = await supbase
             .from("subtasks")
-            .upsert(
-              {
-                value: st.value,
-                is_done: st.isDone,
-                order: st.order,
-                task_id: st.taskId,
-              },
-              { onConflict: "id" }
-            )
-            .eq("id", st.id)
+            .upsert({
+              id: st.id,
+              value: st.value,
+              is_done: st.isDone,
+              order: st.order,
+              task_id: st.taskId,
+            })
+            .eq("task_id", task.id)
             .select("id")
             .throwOnError();
           st.id = subtaskId![0]!.id;
