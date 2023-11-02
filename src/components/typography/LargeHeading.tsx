@@ -8,6 +8,7 @@ const StyledLargeHeading = styled.h1<{ $isDangerText: boolean; $isPrimary: boole
   line-height: normal;
   color: ${(props) =>
     props.$isDangerText ? props.theme.red : props.$isPrimary ? props.theme.primaryText : props.theme.secondaryText};
+  width: 100%;
 `;
 
 const LargeHeading = ({

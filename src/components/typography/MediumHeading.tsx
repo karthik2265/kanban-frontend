@@ -7,6 +7,7 @@ const StyledMediumHeading = styled.h1`
   font-weight: 700;
   line-height: normal;
   color: ${(props) => props.theme.primaryText};
+  width: 100%;
 `;
 
 const MediumHeading = ({ children }: { children: ReactNode }) => {

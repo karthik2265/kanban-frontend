@@ -7,6 +7,7 @@ const StyledMediumBodyText = styled.h1<{ $isPrimary: boolean }>`
   font-weight: 500;
   line-height: 1.4375rem;
   color: ${(props) => (props.$isPrimary ? props.theme.primaryText : props.theme.secondaryText)};
+  width: 100%;
 `;
 
 const MediumBodyText = ({ children, isPrimary = true }: { children: ReactNode; isPrimary?: boolean }) => {

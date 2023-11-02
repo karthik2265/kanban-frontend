@@ -5,6 +5,7 @@
   padding: 0;
   margin: 0;
   box-sizing: border-box;
+  word-wrap: break-word;
 }
 
 /* For Webkit browsers like Chrome, Safari */

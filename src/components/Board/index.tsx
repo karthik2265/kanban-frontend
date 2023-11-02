@@ -16,7 +16,7 @@ import MediumHeading from "@/components/typography/MediumHeading";
 import ButtonPrimaryLarge from "@/components/buttons/ButtonPrimaryLarge";
 import withDraggable from "@/components/dnd/draggableHOC";
 import withDroppable from "@/components/dnd/droppableHOC";
-import { StyledBoardWrapper, StyledColumnTasksWrapper, StyledNewColumn, StyledTask } from "./StyledComponents";
+import { StyledBoardWrapper, StyledColumnTasksWrapper, StyledTask } from "./StyledComponents";
 import EditBoard from "@/components/UpdateOrCreateNewBoard";
 import CreateNewBoard from "@/components/UpdateOrCreateNewBoard";
 
@@ -153,8 +153,6 @@ const Board = () => {
           </div>
         )}
       </DragDropContext>
-      {/* board with columns */}
-      {!isColumnsEmpty && <StyledNewColumn onClick={() => setIsEditBoardModalOpen(true)} />}
       {/* modals */}
       <Modal isOpen={isTaskDetailsModalOpen} setIsOpen={setIsTaskDetailsModalOpen}>
         {selectedTask && (

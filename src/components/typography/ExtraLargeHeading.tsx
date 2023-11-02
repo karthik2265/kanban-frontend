@@ -7,6 +7,7 @@ const StyledExtraLargeHeading = styled.h1`
   font-weight: 700;
   line-height: normal;
   color: ${(props) => props.theme.primaryText};
+  width: 100%;
 
   @media (max-width: 800px) {
     font-size: 1.25rem;

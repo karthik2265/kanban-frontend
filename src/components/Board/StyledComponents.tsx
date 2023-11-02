@@ -2,12 +2,20 @@ import { styled } from "styled-components";
 
 export const StyledBoardWrapper = styled.div<{ $isColumnsAvailable: boolean }>`
   overflow: scroll;
-  height: 100%;
   display: flex;
+  height: calc(100% - 6rem);
   justify-content: ${(props) => (props.$isColumnsAvailable ? "" : "center")};
   align-items: ${(props) => (props.$isColumnsAvailable ? "" : "center")};
   gap: 1.5rem;
   padding: 1rem;
+
+  @media (max-width: 800px) {
+    height: calc(100% - 5rem);
+  }
+
+  @media (max-width: 650px) {
+    height: calc(100% - 4rem);
+  }
 `;
 
 export const StyledColumnTasksWrapper = styled.div`
@@ -16,12 +24,12 @@ export const StyledColumnTasksWrapper = styled.div`
   justify-content: center;
   align-items: center;
   gap: 1.25rem;
-  padding-bottom: 1.25rem;
   width: 17.5rem;
 `;
 
 export const StyledTask = styled.div`
   width: 17.5rem;
+  overflow: hidden;
   flex-shrink: 0;
   display: flex;
   flex-direction: column;

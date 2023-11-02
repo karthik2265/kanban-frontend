@@ -7,6 +7,7 @@ const StyledLargeBodyText = styled.h1`
   font-weight: 500;
   line-height: 1.4375rem;
   color: ${(props) => props.theme.primaryText};
+  width: 100%;
 `;
 
 const LargeBodyText = ({ children }: { children: ReactNode }) => {
