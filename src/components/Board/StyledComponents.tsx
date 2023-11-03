@@ -3,18 +3,18 @@ import { styled } from "styled-components";
 export const StyledBoardWrapper = styled.div<{ $isColumnsAvailable: boolean }>`
   overflow: scroll;
   display: flex;
-  height: calc(100% - 6rem);
+  height: calc(100% - 6.5rem);
   justify-content: ${(props) => (props.$isColumnsAvailable ? "" : "center")};
   align-items: ${(props) => (props.$isColumnsAvailable ? "" : "center")};
   gap: 1.5rem;
   padding: 1rem;
 
   @media (max-width: 800px) {
-    height: calc(100% - 5rem);
+    height: calc(100% - 5.5rem);
   }
 
   @media (max-width: 650px) {
-    height: calc(100% - 4rem);
+    height: calc(100% - 4.5rem);
   }
 `;
 

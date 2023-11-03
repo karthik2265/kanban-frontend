@@ -35,15 +35,6 @@ const StyledContentWrapper = styled.div`
   background-color: ${(props) => props.theme.secondaryBg};
   width: 100%;
   height: 100%;
-  position: fixed;
-  top: 6rem;
-  @media (max-width: 800px) {
-    top: 5rem;
-  }
-
-  @media (max-width: 650px) {
-    top: 4rem;
-  }
 `;
 
 const StyledLayoutWrapper = styled.div`
