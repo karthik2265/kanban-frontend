@@ -43,11 +43,6 @@ type UpdateOrCreateNewBoardProps = {
   initialValues?: Omit<Board & { columns: BoardColumn[] | null }, "order"> | null;
 };
 
-const defaultColumns = [
-  { title: "Todo", order: 1, id: generateTemporaryId() },
-  { title: "Doing", order: 2, id: generateTemporaryId() },
-];
-
 function isDataValid({ title, columns }: { title: string; columns: BoardColumn[] }) {
   if (!title) return false;
   for (let i = 0; i < columns.length; i++) {
@@ -65,7 +60,11 @@ const UpdateOrCreateNewBoard = ({ initialValues = null, onSubmit }: UpdateOrCrea
   const isCreateMode = initialValues === null;
   const [title, setTitle] = useState(isCreateMode ? "" : initialValues.title);
   const [columns, setColumns] = useState<BoardColumn[]>(() => {
-    if (isCreateMode || !initialValues.columns) return defaultColumns;
+    if (isCreateMode || !initialValues.columns)
+      return [
+        { title: "Todo", order: 1, id: generateTemporaryId() },
+        { title: "Doing", order: 2, id: generateTemporaryId() },
+      ];
     return initialValues.columns;
   });
   useEffect(() => {
@@ -149,7 +148,10 @@ const UpdateOrCreateNewBoard = ({ initialValues = null, onSubmit }: UpdateOrCrea
                     addBoard({ title, id, columns, order: findMaxByKey(boards.data, (b) => b.order) + 1 });
                     // reset form to initial state
                     setTitle("");
-                    setColumns(defaultColumns);
+                    setColumns([
+                      { title: "Todo", order: 1, id: generateTemporaryId() },
+                      { title: "Doing", order: 2, id: generateTemporaryId() },
+                    ]);
                     setIsFormSubmitted(false);
                   }
                   onSubmit({ id, title, columns, order: boards.data?.length || 1 });

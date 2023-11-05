@@ -34,12 +34,12 @@ function UserContextProvider({ children }: { children: ReactNode }) {
       }
     });
     // Subscribe to auth changes
-    const { data: authSubscription } = supabase.auth.onAuthStateChange((event, session) => {
+    const { data: authSubscription } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (event === "SIGNED_IN" && session) {
-        setUser({ id: session.user.id });
         // migrate data from localstorage
-        migrateDataFromLocalStorageToSupbase(session.user.id);
+        await migrateDataFromLocalStorageToSupbase(session.user.id);
         boardDataManager.setStrategy(new BoardSupbaseStorageStrategy());
+        setUser({ id: session.user.id });
       }
     });
 

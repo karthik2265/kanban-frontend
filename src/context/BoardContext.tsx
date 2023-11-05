@@ -185,7 +185,7 @@ function reducer(state: State, action: Action) {
         // delete the board
         updatedState.boards.data =
           updatedState.boards.data?.filter((b) => b.id !== action.payload.data?.deletedBoardId) || null;
-        updatedState.boardDetails.data = null;
+        updatedState.boardDetails.data = action.payload.data.boardDetails;
       }
       updatedState.boardDetails.error = action.payload.error;
       updatedState.boardDetails.isProcessing = action.payload.isProcessing;
