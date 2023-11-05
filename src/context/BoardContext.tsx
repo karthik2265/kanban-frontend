@@ -117,6 +117,16 @@ function reducer(state: State, action: Action) {
       break;
     case "UPDATE_BOARD_DETAILS":
       updatedState.boardDetails = { ...action.payload };
+      if (action.payload.data) {
+        const boardDetails = action.payload.data;
+        sortByKey(boardDetails.columns || [], (x) => x.order);
+        boardDetails.columns?.forEach((c) => {
+          sortByKey(c.tasks || [], (x) => x.order);
+          c.tasks?.forEach((t) => {
+            sortByKey(t.subtasks || [], (x) => x.order);
+          });
+        });
+      }
       break;
     case "ADD_BOARD":
       if (!updatedState.boards.data) {
@@ -193,7 +203,6 @@ function reducer(state: State, action: Action) {
             }
           }
         });
-        console.log(task);
       }
       updatedState.boardDetails.isProcessing = action.payload.isProcessing;
       updatedState.boardDetails.error = action.payload.error;

@@ -2,6 +2,7 @@ import supabase from "@/supbaseClient";
 import { ReactNode, createContext, useCallback, useMemo, useState, useEffect, useContext } from "react";
 import { DataContext } from "./DataContext";
 import BoardSupbaseStorageStrategy from "@/data/stratagies/BoardSupbaseStorageStrategy";
+import migrateDataFromLocalStorageToSupbase from "@/data/migrateDataFromLocalStorageToSupbase";
 
 const UserContext = createContext<{
   user: { id: string } | null;
@@ -37,6 +38,7 @@ function UserContextProvider({ children }: { children: ReactNode }) {
       if (event === "SIGNED_IN" && session) {
         setUser({ id: session.user.id });
         // migrate data from localstorage
+        migrateDataFromLocalStorageToSupbase(session.user.id);
         boardDataManager.setStrategy(new BoardSupbaseStorageStrategy());
       }
     });
