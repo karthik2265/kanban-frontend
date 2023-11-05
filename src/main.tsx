@@ -11,16 +11,16 @@ import { UserContextProvider } from "@/context/UserContext";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <ThemeContextProvider>
-      <RootLayoutContextProvider>
-        <DataContextProvider>
-          <UserContextProvider>
+    <RootLayoutContextProvider>
+      <DataContextProvider>
+        <UserContextProvider>
+          <ThemeContextProvider>
             <BoardContextProvider>
               <App />
             </BoardContextProvider>
-          </UserContextProvider>
-        </DataContextProvider>
-      </RootLayoutContextProvider>
-    </ThemeContextProvider>
+          </ThemeContextProvider>
+        </UserContextProvider>
+      </DataContextProvider>
+    </RootLayoutContextProvider>
   </React.StrictMode>
 );

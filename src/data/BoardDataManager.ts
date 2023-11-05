@@ -1,7 +1,7 @@
 import { Board, BoardColumn, BoardDetails, Task } from "@/types";
 import IBoardStorageStrategy from "./stratagies/IBoardStorageStrategy";
 
-export class BoardDataManager {
+class BoardDataManager {
   private strategy: IBoardStorageStrategy;
 
   constructor(strategy: IBoardStorageStrategy) {

@@ -1,6 +1,9 @@
-import { ReactNode, createContext, useState } from "react";
+import { ReactNode, createContext, useContext, useEffect, useState } from "react";
 import { ThemeOptions } from "../types/styles";
 import { ThemeProvider as StyledComponentsThemeContextProvider } from "styled-components";
+import { DataContext } from "./DataContext";
+import useData from "@/hooks/useData";
+import { UserContext } from "./UserContext";
 
 const lightTheme = {
   primaryBg: "#FFFFFF",
@@ -32,11 +35,30 @@ const ThemeContext = createContext<null | {
   toggleTheme: () => void;
 }>(null);
 function ThemeContextProvider({ children }: { children: ReactNode }) {
+  const { userPreferencesDataManager } = useContext(DataContext)!;
+  const { user } = useContext(UserContext)!;
+  const { startProcessing: getTheme } = useData(userPreferencesDataManager.getTheme, (s) => {
+    if (s.data) {
+      setCurrentTheme(s.data);
+    }
+  });
+  const { startProcessing: changeTheme } = useData(userPreferencesDataManager.setTheme, (s) => {
+    if (s.error) {
+      // TODO show notification
+    } else if (s.data) {
+      setCurrentTheme(s.data);
+    }
+  });
   // use dark theme by default
   const [currentTheme, setCurrentTheme] = useState(ThemeOptions.Dark);
+  useEffect(() => {
+    getTheme(user?.id);
+  }, [getTheme]);
   const toggleTheme = () => {
-    if (currentTheme === ThemeOptions.Dark) setCurrentTheme(ThemeOptions.Light);
-    else setCurrentTheme(ThemeOptions.Dark);
+    changeTheme({
+      theme: currentTheme === ThemeOptions.Dark ? ThemeOptions.Light : ThemeOptions.Dark,
+      userId: user?.id,
+    });
   };
   return (
     <ThemeContext.Provider value={{ currentTheme, toggleTheme }}>
