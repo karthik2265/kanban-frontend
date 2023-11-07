@@ -50,7 +50,7 @@ type Action =
   | {
       type: "DELETE_BOARD";
       payload: {
-        data: { deletedBoardId: string; boardDetails: BoardDetails | null } | null;
+        data: string | null;
         isProcessing: boolean;
         error: null | string;
       };
@@ -176,6 +176,7 @@ function reducer(state: State, action: Action) {
         } else {
           boardDetails!.columns = board.columns as null;
         }
+        sortByKey(boardDetails?.columns || [], (x) => x.order);
       }
       updatedState.boardDetails.error = action.payload.error;
       updatedState.boardDetails.isProcessing = action.payload.isProcessing;
@@ -183,9 +184,7 @@ function reducer(state: State, action: Action) {
     case "DELETE_BOARD":
       if (action.payload.data) {
         // delete the board
-        updatedState.boards.data =
-          updatedState.boards.data?.filter((b) => b.id !== action.payload.data?.deletedBoardId) || null;
-        updatedState.boardDetails.data = action.payload.data.boardDetails;
+        updatedState.boards.data = updatedState.boards.data?.filter((b) => b.id !== action.payload.data) || null;
       }
       updatedState.boardDetails.error = action.payload.error;
       updatedState.boardDetails.isProcessing = action.payload.isProcessing;
@@ -203,6 +202,7 @@ function reducer(state: State, action: Action) {
             }
           }
         });
+        sortByKey(updatedState.boardDetails.data?.columns || [], (x) => x.order);
       }
       updatedState.boardDetails.isProcessing = action.payload.isProcessing;
       updatedState.boardDetails.error = action.payload.error;
@@ -225,6 +225,7 @@ function reducer(state: State, action: Action) {
             } else {
               c.tasks = [updatedTask];
             }
+            sortByKey(c.tasks || [], (x) => x.order);
           }
         });
       }
@@ -340,7 +341,8 @@ function BoardContextProvider({ children }: { children: ReactNode }) {
       isProcessing: boolean;
       error: string | null;
     }) => {
-      dispatch({ type: "DELETE_BOARD", payload: s });
+      dispatch({ type: "DELETE_BOARD", payload: { ...s, data: s.data?.deletedBoardId || null } });
+      dispatch({ type: "UPDATE_BOARD_DETAILS", payload: { ...s, data: s.data?.boardDetails || null } });
     },
     [dispatch]
   );

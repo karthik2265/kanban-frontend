@@ -3,6 +3,7 @@ import { ReactNode, createContext, useCallback, useMemo, useState, useEffect, us
 import { DataContext } from "./DataContext";
 import BoardSupbaseStorageStrategy from "@/data/stratagies/BoardSupbaseStorageStrategy";
 import migrateDataFromLocalStorageToSupbase from "@/data/migrateDataFromLocalStorageToSupbase";
+import UserPreferencesSupbaseStorageStrategy from "@/data/stratagies/UserPreferencesSupbaseStorageStrategy";
 
 const UserContext = createContext<{
   user: { id: string } | null;
@@ -20,7 +21,7 @@ function UserContextProvider({ children }: { children: ReactNode }) {
   }, []);
   const logout = useCallback(() => {}, []);
 
-  const { boardDataManager } = useContext(DataContext)!;
+  const { boardDataManager, userPreferencesDataManager } = useContext(DataContext)!;
 
   useEffect(() => {
     // Set the user immediately if already signed in
@@ -28,6 +29,7 @@ function UserContextProvider({ children }: { children: ReactNode }) {
       if (data.session) {
         setUser({ id: data.session.user.id });
         boardDataManager.setStrategy(new BoardSupbaseStorageStrategy());
+        userPreferencesDataManager.setStrategy(new UserPreferencesSupbaseStorageStrategy());
       }
       if (error) {
         // TODO show notification
@@ -39,6 +41,7 @@ function UserContextProvider({ children }: { children: ReactNode }) {
         // migrate data from localstorage
         await migrateDataFromLocalStorageToSupbase(session.user.id);
         boardDataManager.setStrategy(new BoardSupbaseStorageStrategy());
+        userPreferencesDataManager.setStrategy(new UserPreferencesSupbaseStorageStrategy());
         setUser({ id: session.user.id });
       }
     });

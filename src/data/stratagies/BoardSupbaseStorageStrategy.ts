@@ -152,7 +152,7 @@ class BoardSupbaseStorageStrategy implements IBoardStorageStrategy {
         .throwOnError();
       await supbase
         .from("user_preferences")
-        .upsert({ selected_board_id: boardTableData![0].id }, { onConflict: "user_id" })
+        .upsert({ selected_board_id: boardTableData![0].id, user_id: userId }, { onConflict: "user_id" })
         .eq("user_id", userId)
         .throwOnError();
       return newlyCreatedBoard;
@@ -174,8 +174,7 @@ class BoardSupbaseStorageStrategy implements IBoardStorageStrategy {
         board.columns?.map(async (c) => {
           const { data: columnId } = await supbase
             .from("board_columns")
-            .upsert({ title: c.title, order: c.order, board_id: board.id }, { onConflict: "id" })
-            .eq("id", c.id)
+            .upsert({ title: c.title, order: c.order, board_id: board.id, id: c.id }, { onConflict: "id" })
             .select("id")
             .throwOnError();
           columnsNotToBeDeleted.push(columnId![0].id);
@@ -267,8 +266,7 @@ class BoardSupbaseStorageStrategy implements IBoardStorageStrategy {
       await Promise.all(boardColumnsPromises);
       await supbase
         .from("user_preferences")
-        .upsert({ selected_board_id: board.id }, { onConflict: "user_id" })
-        .eq("user_id", userId)
+        .upsert({ selected_board_id: board.id, user_id: userId }, { onConflict: "user_id" })
         .throwOnError();
       const boardDetails = {
         id: board.id,

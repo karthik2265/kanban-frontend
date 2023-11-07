@@ -10,6 +10,10 @@ class UserPreferencesDataManager {
     this.getTheme = this.getTheme.bind(this);
   }
 
+  setStrategy(newStrategy: IUserPreferencesStorageStrategy) {
+    this.strategy = newStrategy;
+  }
+
   setTheme(data: { theme: ThemeOptions; userId?: string }) {
     return this.strategy.setThemePreference(data);
   }

@@ -7,8 +7,7 @@ class UserPreferencesSupbaseStorageStrategy implements IUserPreferencesStorageSt
     try {
       const { data } = await supbase
         .from("user_preferences")
-        .upsert({ selected_theme: theme }, { onConflict: "user_id" })
-        .eq("user_id", userId)
+        .upsert({ selected_theme: theme, user_id: userId }, { onConflict: "user_id" })
         .select(`selected_theme`)
         .throwOnError();
       return data![0].selected_theme;
@@ -25,7 +24,7 @@ class UserPreferencesSupbaseStorageStrategy implements IUserPreferencesStorageSt
         .select(`selected_theme`)
         .eq("user_id", userId)
         .throwOnError();
-      return data ? data[0].selected_theme : null;
+      return data && data.length > 1 ? data[0].selected_theme : null;
     } catch (err) {
       console.log("Something went wrrong while getting the theme preference");
       throw err;
