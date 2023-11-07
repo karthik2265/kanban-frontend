@@ -27,9 +27,9 @@ function UserContextProvider({ children }: { children: ReactNode }) {
     // Set the user immediately if already signed in
     supabase.auth.getSession().then(({ data, error }) => {
       if (data.session) {
-        setUser({ id: data.session.user.id });
         boardDataManager.setStrategy(new BoardSupbaseStorageStrategy());
         userPreferencesDataManager.setStrategy(new UserPreferencesSupbaseStorageStrategy());
+        setUser({ id: data.session.user.id });
       }
       if (error) {
         // TODO show notification
@@ -50,7 +50,7 @@ function UserContextProvider({ children }: { children: ReactNode }) {
     return () => {
       authSubscription.subscription.unsubscribe();
     };
-  }, [boardDataManager]);
+  }, [boardDataManager, userPreferencesDataManager]);
 
   const providerValue = useMemo(() => {
     return {
