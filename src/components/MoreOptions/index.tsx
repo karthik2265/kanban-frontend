@@ -14,7 +14,6 @@ const StyledMoreOptionsIconWrapper = styled.div`
 
 const StyledOptionsWrapper = styled.div`
   display: flex;
-  flex-direction: column;
   justify-content: center;
   align-items: center;
   align-content: center;
@@ -25,8 +24,8 @@ const StyledOptionsWrapper = styled.div`
   top: calc(100% + 1.25rem);
   background-color: ${(props) => props.theme.secondaryBg};
   width: 12rem;
-  height: 5.875rem;
   border-radius: 0.5rem;
+  padding: 0.5rem 0;
 `;
 
 const StyledOption = styled.div<{ $isDangerOption: boolean }>`

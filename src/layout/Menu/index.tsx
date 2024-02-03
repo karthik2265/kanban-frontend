@@ -21,6 +21,7 @@ import Modal from "@/components/Modal";
 import NewTask from "@/components/UpdateOrCreateNewTask";
 import EditBoard from "@/components/UpdateOrCreateNewBoard";
 import DeleteBoard from "@/components/DeleteBoard";
+import InviteToBoard from "@/components/InviteToBoard";
 import MoreOptions from "@/components/MoreOptions";
 import LargeHeading from "@/components/typography/LargeHeading";
 import GitHubIcon from "@/components/icons/Github";
@@ -29,10 +30,23 @@ const Menu = () => {
   const { isSecondaryMenuOpen, toggleSecondaryMenuVisibility } = useContext(RootLayoutContext)!;
   const { boardDetails, editBoard, deleteBoard } = useContext(BoardContext)!;
   const { user, login } = useContext(UserContext)!;
+  const boardActions = [
+    { text: "Edit Board", isDangerOption: false, onClick: () => setIsEditBoardModalOpen(true) },
+
+    { text: "Delete Board", isDangerOption: true, onClick: () => setIsDeleteBoardModalOpen(true) },
+  ];
+  if (user) {
+    boardActions.unshift({
+      text: "Invite to board",
+      isDangerOption: false,
+      onClick: () => setIsInviteToBoardModalOpen(true),
+    });
+  }
   // modals
   const [isNewTaskModalOpen, setIsNewTaskModalOpen] = useState(false);
   const [isEditBoardModalOpen, setIsEditBoardModalOpen] = useState(false);
   const [isDeleteBoardModalOpen, setIsDeleteBoardModalOpen] = useState(false);
+  const [isInviteToBoardModalOpen, setIsInviteToBoardModalOpen] = useState(false);
   return (
     <StyledMenuWrapper>
       <StyledLogoWrapper $isSecondaryMenuOpen={isSecondaryMenuOpen}>
@@ -58,9 +72,7 @@ const Menu = () => {
               login();
             }}
           >
-            {user ? (
-              null
-            ) : (
+            {user ? null : (
               <StyledLoginButton>
                 <GitHubIcon />
                 <LargeHeading>Login</LargeHeading>
@@ -80,14 +92,7 @@ const Menu = () => {
               <span> Add New Task</span>
             </div>
           </StyledAddNewTaskActionButton>
-          {boardDetails.data && (
-            <MoreOptions
-              options={[
-                { text: "Edit Board", isDangerOption: false, onClick: () => setIsEditBoardModalOpen(true) },
-                { text: "Delete Board", isDangerOption: true, onClick: () => setIsDeleteBoardModalOpen(true) },
-              ]}
-            />
-          )}
+          {boardDetails.data && <MoreOptions options={boardActions} />}
         </StyledActionsWrapper>
       </StyledMenuContentWrapper>
       {/* modals */}
@@ -120,6 +125,9 @@ const Menu = () => {
             }}
           />
         )}
+      </Modal>
+      <Modal isOpen={isInviteToBoardModalOpen} setIsOpen={setIsInviteToBoardModalOpen}>
+        {boardDetails.data && <InviteToBoard id={boardDetails.data.id} />}
       </Modal>
     </StyledMenuWrapper>
   );

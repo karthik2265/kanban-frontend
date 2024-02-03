@@ -16,6 +16,7 @@ const BoardContext = createContext<null | {
   addTask: (task: Task) => void;
   editTask: (task: Task) => void;
   deleteTask: (taskId: string) => void;
+  joinBoard: ({ boardId, userId }: { boardId: string; userId: string }) => void;
 }>(null);
 
 type Action =

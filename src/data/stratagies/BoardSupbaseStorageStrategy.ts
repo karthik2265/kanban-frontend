@@ -370,6 +370,100 @@ class BoardSupbaseStorageStrategy implements IBoardStorageStrategy {
       throw err;
     }
   }
+
+  async joinBoard({
+    boardId,
+    userId,
+    order,
+  }: {
+    boardId: string;
+    userId: string;
+    order: number;
+  }): Promise<BoardDetails> {
+    try {
+      // add user to board
+      await supbase
+        .from("board_users")
+        .insert([{ user_id: userId, board_id: boardId, order }])
+        .throwOnError();
+
+      // fetch board details
+      const { data: boardData } = await supbase.from("boards").select(`title`).eq("board_id", boardId).throwOnError();
+      const title = boardData![0].title;
+      const { data: boardColumnsData } = await supbase
+        .from("board_columns")
+        .select(
+          `
+            id,
+            title,
+            order
+            `
+        )
+        .eq("board_id", boardId)
+        .throwOnError();
+      const boardColumnsPromises =
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        boardColumnsData?.map(async (column: { [key: string]: any }) => {
+          const { data: tasksData } = await supbase
+            .from("tasks")
+            .select(
+              `
+            id,
+            title,
+            description,
+            order
+            `
+            )
+            .eq("board_column_id", column.id);
+          const tasksPromises =
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            tasksData?.map(async (task: { [key: string]: any }) => {
+              const { data: subtasksData } = await supbase
+                .from("subtasks")
+                .select(
+                  `
+              id,
+              value,
+              is_done,
+              order
+              `
+                )
+                .eq("task_id", task.id)
+                .throwOnError();
+              task["subtasks"] = subtasksData?.map((st) => {
+                return {
+                  ...st,
+                  isDone: st.is_done,
+                  taskId: task.id,
+                };
+              });
+            }) || [];
+          await Promise.all(tasksPromises);
+          column["tasks"] = tasksData?.map((t) => {
+            return {
+              ...t,
+              columnId: column.id,
+            };
+          });
+        }) || [];
+      await Promise.all(boardColumnsPromises);
+      await supbase
+        .from("user_preferences")
+        .upsert({ selected_board_id: boardId, user_id: userId }, { onConflict: "user_id" })
+        .eq("user_id", userId)
+        .throwOnError();
+      const boardDetails = {
+        id: boardId,
+        title,
+        order: order,
+        columns: boardColumnsData,
+      } as BoardDetails;
+      return boardDetails;
+    } catch (err) {
+      console.error("Something went wrong while joining a board");
+      throw err;
+    }
+  }
 }
 
 export default BoardSupbaseStorageStrategy;

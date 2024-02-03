@@ -1,8 +1,8 @@
 import styled from "styled-components";
 import LargeHeading from "@/components/typography/LargeHeading";
-import MediumBodyText from "../typography/MediumBodyText";
-import ButtonDestructive from "../buttons/ButtonDestructive";
-import ButtonSecondary from "../buttons/ButtonSecondary";
+import MediumBodyText from "@/components/typography/MediumBodyText";
+import ButtonDestructive from "@/components/buttons/ButtonDestructive";
+import ButtonSecondary from "@/components/buttons/ButtonSecondary";
 
 const StyledWrapper = styled.div`
   width: 30rem;

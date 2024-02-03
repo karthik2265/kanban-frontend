@@ -1,5 +1,6 @@
 import { Board, BoardColumn, BoardDetails, Task } from "@/types";
 import IBoardStorageStrategy from "./stratagies/IBoardStorageStrategy";
+import BoardSupbaseStorageStrategy from "./stratagies/BoardSupbaseStorageStrategy";
 
 class BoardDataManager {
   private strategy: IBoardStorageStrategy;
@@ -63,6 +64,13 @@ class BoardDataManager {
 
   deleteTask(taskId: string) {
     return this.strategy.deleteTask(taskId);
+  }
+
+  joinBoard({ userId, boardId, order }: { boardId: string; userId: string; order: number }) {
+    if (this.strategy instanceof BoardSupbaseStorageStrategy) {
+      return this.strategy.joinBoard({ userId, boardId, order });
+    }
+    return null;
   }
 
   migrateDataFromLocalStorageToSupbase() {
