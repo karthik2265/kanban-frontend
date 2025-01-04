@@ -321,7 +321,6 @@ class BoardSupbaseStorageStrategy implements IBoardStorageStrategy {
 
   async editTask(task: Task): Promise<Task> {
     try {
-      console.log("task to be edited", task);
       // update title, columnId, order, description in tasks table
       await supbase
         .from("tasks")

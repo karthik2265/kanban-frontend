@@ -60,7 +60,6 @@ const Board = () => {
       });
       tasksInDestinationColumn.splice(taskIndexInDestinationColumn, 0, task!);
       rearrangeOrderAccordingToIndex(tasksInDestinationColumn);
-      console.log("tasksInDestinationColumn = ", tasksInDestinationColumn);
       const editTasksPromises = tasksInDestinationColumn.map((t) => editTask(t));
       await Promise.all(editTasksPromises);
     }

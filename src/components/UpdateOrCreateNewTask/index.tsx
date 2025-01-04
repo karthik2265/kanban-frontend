@@ -60,7 +60,6 @@ const UpdateOrCreateNewTask = ({
   const { boardDetails, addTask, editTask } = useContext(BoardContext)!;
   const [title, setTitle] = useState(isCreateMode ? "" : initialValues.title);
   const [taskId, setTaskId] = useState(() => (isCreateMode ? generateTemporaryId() : initialValues.id));
-  console.log("taskId in Task component = ", taskId);
   const [description, setDescription] = useState<null | string>(isCreateMode ? null : initialValues.description);
   const [subtasks, setSubtasks] = useState(
     isCreateMode ? [{ id: generateTemporaryId(), value: "", order: 1, isDone: false, taskId }] : initialValues.subtasks
